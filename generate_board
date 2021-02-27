@@ -1,0 +1,22 @@
+from blessed import Terminal
+
+term = Terminal()
+print(term.home + term.red_on_black + term.clear)
+
+#board parameters
+map_wight = 60
+map_height = 40
+anthill_1 = [12, 5]
+anthill_2 = [17, 36]
+
+#create the board
+print(' __'*map_wight)
+for y in range(map_height):
+    print('|__'*map_wight + '|')
+
+#put the anthills on the board
+print(term.move_xy(anthill_1[0]*3+1, anthill_1[1])+ '1')
+
+
+
+print(term.move_xy(0,map_height+2))
