@@ -4,25 +4,50 @@ term = Terminal()
 print(term.home + term.white_on_black + term.clear)
 
 #board parameters
-map_wight = 60
-map_height = 40
-anthill_1 = [12, 5]
-anthill_2 = [17, 36]
+map_wight = game["board"]["length_x"]
+map_height = game["board"]["length_y"]
+anthill_1 = [game["anthills"]["blue"]["x"], game["anthills"]["blue"]["y"]]
+anthill_2 = [game["anthills"]["orange"]["x"], game["anthills"]["orange"]["y"]]
 
 
 #create the board
-print(' __'*map_wight)
+for x in range(map_wight):
+    number = x+1
+    print(term.move_xy(x*3+5, 0) + str(number))
+print('    '+' __'*map_wight)
 for y in range(map_height):
-    print('|__'*map_wight + '|')
+    if y < 9:
+        print(' '+ str(y+1) + '  ' + '|__'*map_wight + '|')
+    else:
+        print(str(y+1) + '  ' + '|__'*map_wight + '|')
 
-#put the anthills on the board
-x_target = 18
-y_target = 9
-x_locate = x_target * 3 - 2
-y_locate = y_target + 1
+#put the blue anthills on the board
+x_blue_target = game["anthills"]["blue"]["x"]
+y_blue_target = game["anthills"]["blue"]["y"]
+x_locate = x_blue_target * 3 + 2
+y_locate = y_blue_target + 1
 
 for y in range(3):
     print(term.move_xy(x_locate - 4, y_locate - (y-1)) + term.white_on_blue + '|__'*3 + '|')
 print(term.move_xy(x_locate, y_locate) + '\u23CF')
+
+#put the orange anthills on the board
+x_orange_target = game["anthills"]["orange"]["x"]
+y_orange_target = game["anthills"]["orange"]["y"]
+x_locate = x_orange_target * 3 + 2
+y_locate = y_orange_target + 1
+
+for y in range(3):
+    print(term.move_xy(x_locate - 4, y_locate - (y-1)) + term.white_on_orange + '|__'*3 + '|')
+print(term.move_xy(x_locate, y_locate) + '\u23CF')
+
+#put all the clods on the board
+
+clod = -1
+for clods in game["clods"]:
+    clod += 1
+    x_locate = game["clods"][clod][0]
+    y_locate = game["clods"][clod][1]
+    print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.red_on_black + '\U0001f4a9')
 
 print(term.move_xy(0,map_height+2) + term.white_on_black)
