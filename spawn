@@ -1,0 +1,106 @@
+def spawn(game):
+    """ Spawn a new ant beside the anthill
+    
+    Parameters
+    ------------------------
+    game : data structure that contains game's informations (dict)
+    
+    Version
+    --------------
+    Specification : Alexis Van Wallendael (v.1 21/02/21)
+    Implementation : Alexandre Helman (v.3 19/03/21)
+    """
+
+    orange_anthill_x = game["anthills"]["orange"]["x"]
+    orange_anthill_y = game["anthills"]["orange"]["y"]
+    blue_anthill_x = game["anthills"]["blue"]["x"]
+    blue_anthill_y = game["anthills"]["blue"]["y"]
+
+    ## Partie orange
+    nb_orants = 0
+    for or_ants in game["ants"]["orange"] :
+        nb_orants += 1
+
+    get_orclods = 0
+    nclod = 0
+    for clod in game["clods"] :
+        clodx = game["clods"][nclod][0]
+        clody = game["clods"][nclod][1]
+        nclod += 1
+        if (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x, orange_anthill_y - 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y - 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y - 1) :
+            get_orclods += 1
+
+    if get_orclods < 3 :
+        level = 1
+    elif get_orclods >= 3 and get_orclods < 6 :
+        level = 2
+    elif get_orclods >= 6 :
+        level = 3
+
+    if level == 1 :
+        life = 3
+    elif level == 2 :
+        life = 5
+    elif level == 3 :
+        life = 7
+    
+    game["ants"]["orange"].append((orange_anthill_x, orange_anthill_y, life, level))
+
+   ## Partie bleue
+
+    nb_blants = 0
+    for bl_ants in game["ants"]["blue"] :
+        nb_blants += 1
+
+    get_blclods = 0
+    nclod = 0
+    for clod in game["clods"] :
+        clodx = game["clods"][nclod][0]
+        clody = game["clods"][nclod][1]
+        nclod += 1
+        if (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x, blue_anthill_y - 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y - 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y - 1) :
+            get_blclods += 1
+
+    if get_blclods < 3 :
+        level = 1
+    elif get_blclods >= 3 and get_blclods < 6 :
+        level = 2
+    elif get_blclods >= 6 :
+        level = 3
+
+    if level == 1 :
+        life = 3
+    elif level == 2 :
+        life = 5
+    elif level == 3 :
+        life = 7
+
+    game["ants"]["blue"].append((blue_anthill_x, blue_anthill_y, life, level))
