@@ -48,6 +48,11 @@ for clods in game["clods"]:
     clod += 1
     x_locate = game["clods"][clod][0]
     y_locate = game["clods"][clod][1]
-    print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.red_on_black + '\U0001f4a9')
+    if game["clods"][clod][2] == 1:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_green + '\U0001f4a9')
+    if game["clods"][clod][2] == 2:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_yellow + '\U0001f4a9') 
+    if game["clods"][clod][2] == 3:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_red + '\U0001f4a9') 
 
 print(term.move_xy(0,map_height+2) + term.white_on_black)
