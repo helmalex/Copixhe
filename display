@@ -1,5 +1,8 @@
 from blessed import Terminal
 
+nb_clod = load_board(path, game)
+
+
 term = Terminal()
 print(term.home + term.white_on_black + term.clear)
 
@@ -27,6 +30,7 @@ y_blue_target = game["anthills"]["blue"]["y"]
 x_locate = x_blue_target * 3 + 2
 y_locate = y_blue_target + 1
 
+
 for y in range(3):
     print(term.move_xy(x_locate - 4, y_locate - (y-1)) + term.white_on_blue + '|__'*3 + '|')
 print(term.move_xy(x_locate, y_locate) + '\u23CF')
@@ -42,6 +46,49 @@ for y in range(3):
 print(term.move_xy(x_locate, y_locate) + '\u23CF')
 
 #put all the clods on the board
+
+clod = -1
+for clods in game["clods"]:
+    clod += 1
+    x_locate = game["clods"][clod][0]
+    y_locate = game["clods"][clod][1]
+    if game["clods"][clod][2] == 1:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_coral1 + '\U0001f4a9')
+    if game["clods"][clod][2] == 2:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_salmon4 + '\U0001f4a9') 
+    if game["clods"][clod][2] == 3:
+        print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_coral4 + '\U0001f4a9') 
+
+#put the legend
+
+print(term.move_xy(200, 1) + term.white_on_black + 'Summary :')
+
+print(term.move_xy(200, 3) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
+print(term.move_xy(200, 4) + term.white_on_salmon4  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
+print(term.move_xy(200, 5) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
+
+print(term.move_xy(200, 7) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
+print(term.move_xy(200, 8) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
+
+print(term.move_xy(200, 10) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
+print(term.move_xy(200, 11) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
+print(term.move_xy(200, 12) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
+
+print(term.move_xy(200, 14) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
+print(term.move_xy(200, 15) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
+print(term.move_xy(200, 16) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
+
+print(term.move_xy(200, 19) + 'Note :')
+print(term.move_xy(200, 21) + 'a clod carried by an ant takes on the color of the')
+print(term.move_xy(200, 22) + 'ant')
+
+for y in range(23):
+    print(term.move_xy(198, y) + term.white_on_black + '|')
+print(term.move_xy(199, 23) + '\u2015'*50)
+
+
+
+print(term.move_xy(0,map_height+2) + term.white_on_black)
 
 clod = -1
 for clods in game["clods"]:
