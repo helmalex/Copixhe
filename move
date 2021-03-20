@@ -5,7 +5,7 @@ def move(game, player_color, orders):
     ----------
     game : data structure that contains game's informations (dict)
     player_color: player's color so orange or blue(str)
-    order: player's order in move_list
+    orders: player's order in move_list(lift)
     
 
     Version
@@ -38,6 +38,9 @@ def move(game, player_color, orders):
                                     else:
                                         clod_n = 0
                                         for clod in game["clods"]:
+                                            if x_verif == game["clods"][clod_n][0]:
+                                                if y_verif == game["clods"][clod_n][1]:
+                                                    move_clod = clod_n
                                             if x_new == game["clods"][clod_n][0]:
                                                 if y_new == game["clods"][clod_n][1]:
                                                     no_move = True
@@ -46,7 +49,9 @@ def move(game, player_color, orders):
                                             else:
                                                 no_move = False
                                             clod_n += 1
-                                        if not no_move:
+                                        if not no_move: 
                                             game["ants"][player_color][ant_n][0] = x_new
                                             game["ants"][player_color][ant_n][1] = y_new
+                                            game["clods"][move_clod][0] = x_new
+                                            game["clods"][move_clod][1] = y_new
             ant_n += 1
