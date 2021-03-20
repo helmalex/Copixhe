@@ -67,17 +67,6 @@ def order_treatment(orders):
     Spécification : Alexandre Helman (v.1 21/02/2021)
     """
 
-
-    """Connect the user to a distant game.
-
-    Parameters
-    ----------
-    ip_game : IP adress of the distant game (str).
-
-    Version
-    -------
-    Spécification : Alexandre Helman (v.1 21/02/21)"""
-
 def display(game_mode, game):
     """This function show the game board after each turns. If the game is played by 2 bots (0 players), there will be a 500ms break before each turn
     
@@ -159,4 +148,13 @@ def spawn(game):
     Version
     --------------
     Specification : Alexis Van Wallendael (v.1 21/02/21)
+    """
+
+def load_board()
+    """ Load the file that contains the board and fulfill the data_structure
+    
+    Parameters
+    -----------
+    path : path of the file that contains the map
+    game : 
     """
