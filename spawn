@@ -1,4 +1,4 @@
-def spawn(game):
+def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     """ Spawn a new ant beside the anthill
     
     Parameters
@@ -8,7 +8,7 @@ def spawn(game):
     Version
     --------------
     Specification : Alexis Van Wallendael (v.1 21/02/21)
-    Implementation : Alexandre Helman (v.3 19/03/21)
+    Implementation : Alexandre Helman (v.4 20/03/21)
     """
 
     orange_anthill_x = game["anthills"]["orange"]["x"]
@@ -57,8 +57,9 @@ def spawn(game):
         life = 5
     elif level == 3 :
         life = 7
-    
-    game["ants"]["orange"].append((orange_anthill_x, orange_anthill_y, life, level))
+
+    is_lifting_clod = False
+    game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
 
    ## Partie bleue
 
@@ -103,4 +104,4 @@ def spawn(game):
     elif level == 3 :
         life = 7
 
-    game["ants"]["blue"].append((blue_anthill_x, blue_anthill_y, life, level))
+    game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
