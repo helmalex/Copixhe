@@ -1,0 +1,47 @@
+def is_game_over(game):
+    """ Check if the game is over or not
+
+    Parameters
+    ------------------------
+    game : data structure that contains game's informations (dict)
+
+    Version
+    ----------------
+    Specification : Alexis Van Wallendael (v.1 21/02/21)
+    Implémentaton : Alexis Van Wallendael (v.1 19/03/21)
+    """
+    blue_anthills = []
+    blue_anthills.append(game['anthills']['blue']['x'])
+    blue_anthills.append(game['anthills']['blue']['y'])
+
+    orange_anthills = []
+    orange_anthills.append(game['anthills']['orange']['x'])
+    orange_anthills.append(game['anthills']['orange']['y'])
+
+    orange_victory = []
+    for element in game['clods']:
+        if (element[0] == orange_anthills[0] and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] and element[1] == orange_anthills[1] - 1) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1]) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1]) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1] - 1) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1] - 1):
+            orange_victory.append(element)
+    if len(orange_victory) == 8:
+        print("Orange has won !")
+
+    blue_victory = []
+    for element in game['clods']:
+        if (element[0] == blue_anthills[0] and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] and element[1] == blue_anthills[1] - 1) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1]) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1]) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1] - 1) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1] - 1):
+            blue_victory.append(element)
+    if len(blue_victory) == 8:
+        print("Blue has won !")
