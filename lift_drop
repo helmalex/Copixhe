@@ -1,0 +1,38 @@
+def lift_drop(game, player_color, orders):
+    """Change the ant's state from False (empty) to True (full) if the ant lift a clod or from True(full) to False(empty)
+    if the ant drop a clod
+
+    Parameters
+    ----------
+    game : data structure that contains game's informations (dict)
+    player_color: player's color so orange or blue(str)
+    orders: player's order in lift_list(list)
+
+    Version
+    -------
+    Specification : Bastien Marchal (v.2 20/03/21)
+    Implémentation : Bastien Marchal (v.1 20/03/21)
+    """
+
+    for order in orders :
+        info = order.split(":")
+        coord_verif = info[0].split("-")
+        x_verif = int(coord_verif[0])
+        y_verif = int(coord_verif[1])
+        lift_drop = info[1]
+        ant_n = 0
+        for ant in game["ants"][player_color] :
+            x = game["ants"][player_color][ant_n][0]
+            y = game["ants"][player_color][ant_n][1]
+            if x == x_verif:
+                if y == y_verif:
+                    clod_n = 0
+                    for clod in game["clods"]:
+                        if x_verif == game["clods"][clod_n][0]:
+                            if y_verif == game["clods"][clod_n][1]:
+                                if lift_drop == "lift":
+                                    game["ants"][player_color][ant_n][4] = True
+                        clod_n += 1
+                    if lift_drop == "drop":
+                        game["ants"][player_color][ant_n][4] = False
+            ant_n += 1
