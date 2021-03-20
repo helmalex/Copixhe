@@ -1,0 +1,27 @@
+def gamemode():
+    '''This function determinates how the game will be played (how many players, IA)
+    
+    Return :
+    =========================================================
+    game_mode : how many users there will be (0,1,2) (int)
+
+    Version :
+    =========================================================
+    specification : Antoine Culot (v1 20/02/21)
+    implementation : Alexandre Helman (v2 20/03/2021)
+    '''
+
+    choix = input("Combien de joueurs ? (0 : IA v IA, 1 : joueur v IA, 2 : joueur vs. joueur)")
+    mode = "unknown"
+
+    if choix == 0 :
+        mode = 'online'
+    elif choix == 1 :
+        mode = 'solo'
+    elif choix == 2 :
+        mode = 'local'
+    else :
+        print("Ce choix n'est pas valable.")
+        gamemode()
+        
+    return mode
