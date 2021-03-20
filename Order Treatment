@@ -1,0 +1,24 @@
+def order_treatment(orders):
+    """Analyse the string that contains the player's orders, if the given order is illegal, it will be ask again to the user to enter a correct order
+
+    Parameters
+    ----------
+    orders : string that contains the player's orders (str).
+
+    Version
+    -------
+    Spécification : Alexandre Helman (v.1 21/02/2021)
+    Implémentaton : Alexis Van Wallendael (v.1 12/03/21)
+    """
+    my_list = orders.split()
+    move_list = []
+    attack_list = []
+    lift_list = []
+
+    for element in my_list:
+        if element[5:7] == ":@" or element[4:6] == ":@" or element[3:5] == ":@":
+            move_list.append(element)
+        elif element[5:7] == ":∗" or element[4:6] == ":∗" or element[3:5] == ":∗":
+            attack_list.append(element)
+        elif element[5] == ":" or element[4] == ":" or element[3] == ":":
+            lift_list.append(element)
