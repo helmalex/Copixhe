@@ -1,3 +1,4 @@
+import random
 def IA_Play(game, player_color):
     """Read the board and play on its own
 
