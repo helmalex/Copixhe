@@ -1,0 +1,68 @@
+def IA_Play(game, player_color):
+    """Read the board and play on its own
+
+    Parameters
+    ----------
+    game : data structure that contains game informations (dict).
+    player_color: player's color so orange or blue(str)
+    Return
+    ------
+    ia_orders : Orders from the IA for the actual game.
+
+    Version
+    -------
+    Spécification : Bastien Marchal (v.2 22/03/2021)
+    Implémentation: Bastien Marchal (v.1 22/03/2021)
+
+    """
+    ia_orders = ""
+    ant_n = 0
+    if player_color == "blue":
+        enemy_color = "orange"
+    else :
+        enemy_color = "blue"
+    for ant in game["ants"][player_color]:
+        x_me = game["ants"][player_color][ant_n][0]
+        y_me = game["ants"][player_color][ant_n][1]
+        enemy_n = 0
+        for enemy in game["ants"][enemy_color]:
+            x_enemy = game["ants"][enemy_color][enemy_n][0]
+            y_enemy = game["ants"][enemy_color][enemy_n][1]
+            if x_me - x_enemy <= 1 and x_me - x_enemy >= -1 :
+                if y_me - y_enemy <= 1 and y_me - y_enemy >= -1 :
+                    ia_orders += str(y_me + "-" + x_me + ":*" + y_enemy + "-" + x_enemy + " ")
+            enemy_n += 1
+        clod_n = 0
+        for clod in game["clods"]:
+            if x_me == game["clods"][clod_n][0] :
+                if y_me == game["clods"][clod_n][1] :
+                    ia_orders += str(y_me + "-" + x_me + "lift" + " ")
+            clod_n += 1
+        change_x = random.randint(0, 2)
+        change_y = random.randint(0, 2)
+        if change_x == 0:
+            new_x = x_me - 1
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        elif change_x == 1:
+            new_x = x_me
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        elif change_x == 2:
+            new_x = x_me + 1
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        ia_orders += str(y_me + "-" + x_me + ":@" + new_y + "-" + new_x)
+        ant_n += 1
