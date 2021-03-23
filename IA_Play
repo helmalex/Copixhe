@@ -6,6 +6,7 @@ def IA_Play(game, player_color):
     ----------
     game : data structure that contains game informations (dict).
     player_color: player's color so orange or blue(str)
+    
     Return
     ------
     ia_orders : Orders from the IA for the actual game.
@@ -67,3 +68,4 @@ def IA_Play(game, player_color):
                 new_y = y_me + 1
         ia_orders += str(y_me + "-" + x_me + ":@" + new_y + "-" + new_x)
         ant_n += 1
+    return ia_orders
