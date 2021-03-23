@@ -15,7 +15,7 @@ def display(game_mode, game):
     Version :
     ====================================================================
     specification : Antoine Culot (v.1 21/02/21)
-    implementation : Antoine Culot (v.3,1 23/03/21)
+    implementation : Antoine Culot (v.3,1 21/03/21)
     """
 
     term = Terminal()
@@ -102,5 +102,6 @@ def display(game_mode, game):
 
 
         print(term.move_yx(term.height, 0) + term.white_on_black)
-        
-diplay(0, game)
+
+
+display(0, game)
