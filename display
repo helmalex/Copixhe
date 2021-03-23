@@ -47,8 +47,8 @@ def display(game_mode, game):
 
 
     for y in range(3):
-        print(term.move_xy(x_locate - 4, y_locate - (y-1)) + term.white_on_blue + '|__'*3 + '|')
-    print(term.move_xy(x_locate, y_locate) + '\u23CF')
+        print(term.move_yx(y_locate - (y-1), x_locate - 4) + term.white_on_blue + '|__'*3 + '|')
+    print(term.move_yx(y_locate, x_locate) + '\u23CF')
 
     #put the orange anthills on the board
     x_orange_target = game["anthills"]["orange"]["x"]
@@ -57,8 +57,8 @@ def display(game_mode, game):
     y_locate = y_orange_target + 1
 
     for y in range(3):
-        print(term.move_xy(x_locate - 4, y_locate - (y-1)) + term.white_on_orange + '|__'*3 + '|')
-    print(term.move_xy(x_locate, y_locate) + '\u23CF')
+        print(term.move_yx(y_locate - (y-1), x_locate - 4) + term.white_on_orange + '|__'*3 + '|')
+    print(term.move_yx(y_locate, x_locate) + '\u23CF')
 
     #put all the clods on the board
 
@@ -68,40 +68,37 @@ def display(game_mode, game):
         x_locate = game["clods"][clod][0]
         y_locate = game["clods"][clod][1]
         if game["clods"][clod][2] == 1:
-            print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_coral1 + '\U0001f4a9')
+            print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral1 + '\U0001f4a9')
         if game["clods"][clod][2] == 2:
-            print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_salmon4 + '\U0001f4a9') 
+            print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_salmon4 + '\U0001f4a9') 
         if game["clods"][clod][2] == 3:
-            print(term.move_xy(x_locate * 3 + 2, y_locate + 1) + term.white_on_coral4 + '\U0001f4a9') 
+            print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral4 + '\U0001f4a9') 
 
     #put the legend
 
-    print(term.move_xy(term.width - 52, 1) + term.white_on_black + 'Summary :')
+    if term.height > map_height + 9:
+        print(term.move_yx(map_height + 3, 0) + term.white_on_black + 'Summary :')
+        #clods
+        print(term.move_yx(map_height + 4, 0) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
+        print(term.move_yx(map_height + 5, 0) + term.white_on_salmon4  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
+        print(term.move_yx(map_height + 6, 0) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
+        #anthills
+        print(term.move_yx(map_height + 4, term.width//3) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
+        print(term.move_yx(map_height + 5, term.width//3) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
+        #blue ants
+        print(term.move_yx(map_height + 7, 0) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
+        print(term.move_yx(map_height + 8, 0) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
+        print(term.move_yx(map_height + 9, 0) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
+        #orange ants
+        print(term.move_yx(map_height + 7, term.width//3) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
+        print(term.move_yx(map_height + 8, term.width//3) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
+        print(term.move_yx(map_height + 9, term.width//3) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
+        #note
+        print(term.move_yx(map_height + 4, term.width//3*2) + 'Note : a clod carried by an ant')
+        print(term.move_yx(map_height + 5, term.width//3*2) + 'takes on the color of the ant')
 
-    print(term.move_xy(term.width - 52, 3) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
-    print(term.move_xy(term.width - 52, 4) + term.white_on_salmon4  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
-    print(term.move_xy(term.width - 52, 5) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
 
-    print(term.move_xy(term.width - 52, 7) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
-    print(term.move_xy(term.width - 52, 8) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
-
-    print(term.move_xy(term.width - 52, 10) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
-    print(term.move_xy(term.width - 52, 11) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
-    print(term.move_xy(term.width - 52, 12) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
-
-    print(term.move_xy(term.width - 52, 14) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
-    print(term.move_xy(term.width - 52, 15) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
-    print(term.move_xy(term.width - 52, 16) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
-
-    print(term.move_xy(term.width - 52, 19) + 'Note :')
-    print(term.move_xy(term.width - 52, 21) + 'a clod carried by an ant takes on the color of the')
-    print(term.move_xy(term.width - 52, 22) + 'ant')
-
-    for y in range(23):
-        print(term.move_xy(term.width - 54, y) + term.white_on_black + '|')
-    print(term.move_xy(term.width - 53, 23) + ('\u2015'*2 + ' ')*17)
-    
-    print(term.move_xy(0,map_height+2) + term.white_on_black)
+    print(term.move_yx(term.height, 0) + term.white_on_black)
 
 
 display(0, game)
