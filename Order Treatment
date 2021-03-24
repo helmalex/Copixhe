@@ -5,20 +5,56 @@ def order_treatment(orders):
     ----------
     orders : string that contains the player's orders (str).
 
+    Return
+    ----------
+    attack_list : list of attack orders
+    move_list : list of move orders
+    clods_list : list of lift and drop orders
+
     Version
     -------
     Spécification : Alexandre Helman (v.1 21/02/2021)
     Implémentaton : Alexis Van Wallendael (v.1 12/03/21)
+                    Alexis Van Wallendael (v.2 24/03/21)
     """
-    my_list = orders.split()
+    orders_list = orders.split()
+    already_played = []
     move_list = []
     attack_list = []
-    lift_list = []
+    clods_list = []
 
-    for element in my_list:
-        if element[5:7] == ":@" or element[4:6] == ":@" or element[3:5] == ":@":
-            move_list.append(element)
-        elif element[5:7] == ":∗" or element[4:6] == ":∗" or element[3:5] == ":∗":
-            attack_list.append(element)
-        elif element[5] == ":" or element[4] == ":" or element[3] == ":":
-            lift_list.append(element)
+
+    for order in orders_list:
+        if order[5:7] == ":@" and order[0:5] not in already_played:
+            move_list.append(order)
+            already_played.append(order[0:5])
+        elif order[4:6] == ":@" and order[0:4] not in already_played:
+            move_list.append(order)
+            already_played.append(order[0:4])
+        elif order[3:5] == ":@" and order[0:3] not in already_played:
+            move_list.append(order)
+            already_played.append(order[0:3])
+
+    for order in orders_list:
+        if order[5:7] == ":∗" and order[0:5] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:5])
+        elif order[4:6] == ":∗" and order[0:4] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:4])
+        elif order[3:5] == ":∗" and order[0:3] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:3])
+
+    for order in orders_list:
+        if order[5] == ":" and order[0:5] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:5])
+        elif order[4] == ":" and order[0:4] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:4])
+        elif order[3] == ":" and order[0:3] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:3])
+
+    return attack_list,move_list,clods_list
