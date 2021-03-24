@@ -1,27 +1,3 @@
-game = {
-    "board" : {
-        "length_x" : 0, "length_y" : 0
-    },
-
-    "ants" : {
-        "orange" : [],
-        "blue" : []
-    },
-
-    "anthills" : {
-        "orange" : {
-            "x" : 9, "y" : 3
-        },
-        "blue" : {
-            "x" : 22, "y" : 8
-        }
-    },
-
-    "clods" : [(8,3,3), (9,2,2), (10,3,1), (21, 8, 1), (22, 7, 2)]
-}
-
-path = "/Users/alexandrehelman/Downloads/carte_test.txt"
-
 def load_board(path, game) :
     """Read the board datas and organise them in a data structure
     
@@ -41,37 +17,37 @@ def load_board(path, game) :
     
     ## chaque niveau d'imbrication verifie que les informations du plateau sont correctement disposees
     if load[0] == 'map:\r\n' or 'map:\n' or 'map:\r' : 
-        x_board = int(load[1][0] + load[1][1])
-        y_board = int(load[1][3] + load[1][4])
+        y_board = int(load[1][0] + load[1][1])
+        x_board = int(load[1][3] + load[1][4])
 
         if load[2] == 'anthills:\r\n' or 'anthills:\r' or 'anthills:\n' : 
             ## extrait les coordonnees de la fourmiliere orange
             if load[3][1] != ' ' :
-                anthills_orange_x = int(load[3][0] + load[3][1])
+                anthills_orange_y = int(load[3][0] + load[3][1])
                 if load[3][4] !=  '\n' or '\r' or ' ' :
-                    anthills_orange_y = int(load[3][3] + load[3][4])
+                    anthills_orange_x = int(load[3][3] + load[3][4])
                 elif load[3][4] == '\n' or '\r' or ' ':
-                    anthills_orange_y = int(load[3][3])
+                    anthills_orange_x = int(load[3][3])
             elif load[3][1] == ' ' :
-                anthills_orange_x = int(load[3][0])
+                anthills_orange_y = int(load[3][0])
                 if load[3][3] != '\n' or '\r' or ' ' :
-                    anthills_orange_y = int(load[3][2] + load[3][3])
+                    anthills_orange_x = int(load[3][2] + load[3][3])
                 elif load[3][3] == '\n' or '\r' or ' ':
-                    anthills_orange_y = int(load[3][2])
+                    anthills_orange_x = int(load[3][2])
 
             ## extrait les coordonnees de la fourmiliere bleue
             if load[4][1] != ' ' :
-                anthills_blue_x = int(load[4][0] + load[4][1])
+                anthills_blue_y = int(load[4][0] + load[4][1])
                 if load[4][4] != '\n' or '\r' or ' ' :
-                    anthills_blue_y = int(load[4][3] + load[4][4])
+                    anthills_blue_x = int(load[4][3] + load[4][4])
                 elif load[4][4] == '\n' or '\r' or ' ':
-                    anthills_blue_y = int(load[4][3])
+                    anthills_blue_x = int(load[4][3])
             elif load[4][1] == ' ' :
-                anthills_blue_x = int(load[4][0])
+                anthills_blue_y = int(load[4][0])
                 if load[4][3] != '\n' or '\r' or ' ' :
-                    anthills_blue_y = int(load[4][2] + load[4][3])
+                    anthills_blue_x = int(load[4][2] + load[4][3])
                 elif load[4][3] == '\n' or '\r' or ' ':
-                    anthills_blue_y = int(load[4][2])
+                    anthills_blue_x = int(load[4][2])
 
             ## verifie que la partie clods commence correctement
             if load[5] == 'clods:\r\n' or 'clods:\n' or 'clods:\r' :
@@ -83,20 +59,20 @@ def load_board(path, game) :
                 for line in range(6, n) :
                 
                     if load[line][1] != " " :
-                        clodx = int(load[line][0] + load[line][1])
+                        clody = int(load[line][0] + load[line][1])
                         if load[line][4] != " " :
-                            clody = int(load[line][3] + load[line][4])
+                            clodx = int(load[line][3] + load[line][4])
                             clod_weigth = int(load[line][6])
                         elif load[line][4] == " " :
-                            clody = int(load[line][3])
+                            clodx = int(load[line][3])
                             clod_weigth = int(load[line][5])
                     elif load[line][1] == " " :
-                        clodx = int(load[line][0])
+                        clody = int(load[line][0])
                         if load[line][3] != " " :
-                            clody = int(load[line][2] + load[line][3])
+                            clodx = int(load[line][2] + load[line][3])
                             clod_weigth = int(load[line][5])
                         elif load[line][3] == " " :
-                            clody = int(load[line][2])
+                            clodx = int(load[line][2])
                             clod_weigth = int(load[line][4])
 
                     ## range les informations sur les mottes dans la structure de donnees
