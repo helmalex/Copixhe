@@ -4,23 +4,23 @@ game = {
     },
 
     "ants" : {
-        "orange" : (),
-        "blue" : ()
+        "orange" : [],
+        "blue" : []
     },
 
     "anthills" : {
         "orange" : {
-            "x" : 0, "y" : 0
+            "x" : 9, "y" : 3
         },
         "blue" : {
-            "x" : 0, "y" : 0
+            "x" : 22, "y" : 8
         }
     },
 
-    "clods" : []
+    "clods" : [(8,3,3), (9,2,2), (10,3,1), (21, 8, 1), (22, 7, 2)]
 }
 
-path = "./Users/alexandrehelman/Downloads/carte_test.txt"
+path = "/Users/alexandrehelman/Downloads/carte_test.txt"
 
 def load_board(path, game) :
     """Read the board datas and organise them in a data structure
@@ -115,6 +115,3 @@ def load_board(path, game) :
 
     else :
         print("Votre fichier n'a pas le format requis.")
-
-load_board(path, game)
-print(game)
