@@ -46,14 +46,14 @@ def order_treatment(orders):
             attack_list.append(order)
             already_played.append(order[0:3])
 
-    for order in orders_list:
-        if order[5] == ":" and order[0:5] not in already_played:
+        for order in orders_list:
+        if (order[5:10] == ":lift" or order[5:10] == ":drop") and order[0:5] not in already_played:
             clods_list.append(order)
             already_played.append(order[0:5])
-        elif order[4] == ":" and order[0:4] not in already_played:
+        elif (order[4:9] == ":lift" or order[4:9] == ":drop") and order[0:4] not in already_played:
             clods_list.append(order)
             already_played.append(order[0:4])
-        elif order[3] == ":" and order[0:3] not in already_played:
+        elif (order[3:8] == ":lift" or order[3:8] == ":drop") and order[0:3] not in already_played:
             clods_list.append(order)
             already_played.append(order[0:3])
 
