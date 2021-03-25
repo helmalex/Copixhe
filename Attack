@@ -1,0 +1,35 @@
+def attack(game, player_color, orders):
+    """ Look in the game's info and remove one life's point at the ant hit
+
+    Parameters
+    -------------------
+    game : all the information on the game (dict)
+    player_color: player's color so orange or blue(str)
+    orders : player orders in attack_list (list)
+
+    Version
+    ------------
+    Specification : Bastien Marchal (v. 1 21/02/21)
+    Implémentation : Alexis Van Wallendael (v.1 20/03/21)"""
+
+    if player_color == "blue" or player_color == "orange":
+        for order in orders:
+            coordonates = order.split(":∗")
+            coord_attacker = coordonates[0].split("−")
+            x_attacker = int(coord_attacker[0])
+            y_attacker = int(coord_attacker[1])
+            coord_target = coordonates[1].split("−")
+            x_target = int(coord_target[0])
+            y_target = int(coord_target[1])
+            x_range = abs(x_target - x_attacker)
+            y_range = abs(y_target - y_attacker)
+            maximum = max(x_range, y_range)
+            if maximum <= 3:
+                for ant in game['ants'][player_color]:
+                    if x_attacker == ant[0] and y_attacker == ant[1]:
+                        for orange_ant in game['ants']['orange']:
+                            if x_target == orange_ant[0] and y_target == orange_ant[1]:
+                                orange_ant[2] -= 1
+                        for blue_ant in game['ants']['blue']:
+                            if x_target == blue_ant[0] and y_target == blue_ant[1]:
+                                blue_ant[2] -= 1
