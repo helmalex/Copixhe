@@ -15,10 +15,10 @@ def attack(game, player_color, orders):
     if player_color == "blue" or player_color == "orange":
         for order in orders:
             coordonates = order.split(":∗")
-            coord_attacker = coordonates[0].split("−")
+            coord_attacker = coordonates[0].split("-")
             x_attacker = int(coord_attacker[0])
             y_attacker = int(coord_attacker[1])
-            coord_target = coordonates[1].split("−")
+            coord_target = coordonates[1].split("-")
             x_target = int(coord_target[0])
             y_target = int(coord_target[1])
             x_range = abs(x_target - x_attacker)
