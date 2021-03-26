@@ -1,0 +1,23 @@
+def user_play(player_color):
+    """This function show an example of all order that the user can give and ask to him to write his order
+    
+    Parameters :
+    ------------
+    player_color : color of the concerned player (str).
+    
+    Return :
+    ------------
+    final_order : string that contains all orders of the concerned player (str).
+    
+    Version :
+    ------------
+    specification : Alexandre Helman (v.2 26/03/21)
+    implementation : Alexandre Helman (v.1 26/03/2021)"""
+
+    print("C'est au joueur %s de donner ses ordres." %player_color)
+    print("Vos ordres doivent etre ecrits dans une seule entree unique et separes par des espaces.")    
+    print("Pour vos ordres, veuillez respecter le format suivant : \n'10−10:lift' : prendre une motte \n'10−10:lift' : deposer une motte \n'12−14:∗12−13' : attacker \n'10−10:@10−11' : se deplacer")
+    
+    final_order = input("Quels sont vos ordres ? ")
+
+    return final_order
