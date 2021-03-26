@@ -29,7 +29,7 @@ def order_treatment(orders):
         if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:5])
-            move_coordonates.append(order[5:])
+            move_coordonates.append(order[7:])
         elif order[4:6] == ":@" and order[0:4] not in already_played and order[6:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:4])
