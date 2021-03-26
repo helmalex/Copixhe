@@ -41,9 +41,9 @@ def is_game_over(game):
                 element[1] == blue_anthills[0] + 1 and element[0] == blue_anthills[1] - 1) or (
                 element[1] == blue_anthills[0] - 1 and element[0] == blue_anthills[1] - 1):
             blue_victory.append(element)
-    if len(orange_victory) == 8:        #Vérifie si le joueur orange a gagné
+    if len(orange_victory) == 8:        #Check if the orange player has won
         print("Orange has won !")
-    elif len(blue_victory) == 8:        #Vérifie si le joueur bleu a gagné
+    elif len(blue_victory) == 8:        #Check if the blue player has won
         print("Blue has won !")
-    elif len(blue_victory) == 8 and len(orange_victory) == 8:       #Vérifie s'il y a une égalité
+    elif len(blue_victory) == 8 and len(orange_victory) == 8:       #Check if there is an equality
         print("Equality")
