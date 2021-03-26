@@ -25,7 +25,7 @@ def order_treatment(orders):
     move_coordonates = []
     
     #Process movement orders 
-            for order in orders_list:
+    for order in orders_list:
         if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:5])
