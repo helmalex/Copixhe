@@ -22,19 +22,23 @@ def order_treatment(orders):
     move_list = []
     attack_list = []
     clods_list = []
-
+    move_coordonates = []
     
     #Process movement orders 
-    for order in orders_list:
-        if order[5:7] == ":@" and order[0:5] not in already_played:
+        for order in orders_list:
+        if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:5])
-        elif order[4:6] == ":@" and order[0:4] not in already_played:
+            move_coordonates.append(order[5:])
+        elif order[4:6] == ":@" and order[0:4] not in already_played and order[6:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:4])
-        elif order[3:5] == ":@" and order[0:3] not in already_played:
+            move_coordonates.append(order[6:])
+        elif order[3:5] == ":@" and order[0:3] not in already_played and order[5:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:3])
+            move_coordonates.append(order[5:])
+
     
     
     #Process attack orders 
