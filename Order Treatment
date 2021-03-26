@@ -23,7 +23,8 @@ def order_treatment(orders):
     attack_list = []
     clods_list = []
 
-
+    
+    #Process movement orders 
     for order in orders_list:
         if order[5:7] == ":@" and order[0:5] not in already_played:
             move_list.append(order)
@@ -34,7 +35,9 @@ def order_treatment(orders):
         elif order[3:5] == ":@" and order[0:3] not in already_played:
             move_list.append(order)
             already_played.append(order[0:3])
-
+    
+    
+    #Process attack orders 
     for order in orders_list:
         if order[5:7] == ":∗" and order[0:5] not in already_played:
             attack_list.append(order)
@@ -45,8 +48,10 @@ def order_treatment(orders):
         elif order[3:5] == ":∗" and order[0:3] not in already_played:
             attack_list.append(order)
             already_played.append(order[0:3])
-
-        for order in orders_list:
+    
+    
+    #Process orders concerning clods of earth 
+    for order in orders_list:
         if (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:
             clods_list.append(order)
             already_played.append(order[0:5])
