@@ -47,7 +47,7 @@ def order_treatment(orders):
         elif order[3:5] == ":∗" and order[0:3] not in already_played:
             attack_list.append(order)
             already_played.append(order[0:3])
-        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           #Traite les ordres concernant les mottes de terre
+        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           #Processes orders for clods
             clods_list.append(order)
             already_played.append(order[0:5])
         elif (order[4:] == ":lift" or order[4:] == ":drop") and order[0:4] not in already_played:
