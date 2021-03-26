@@ -14,7 +14,7 @@ def attack(game, player_color, orders):
 
     if player_color == "blue" or player_color == "orange":
         for order in orders:
-            coordonates = order.split(":∗")             #Extrait les coordonnées de l'attaquant et les coordonnées de la cible
+            coordonates = order.split(":∗")             #Extract the coordinates of the attacker and the coordinates of the target
             coord_attacker = coordonates[0].split("-")
             x_attacker = int(coord_attacker[1])
             y_attacker = int(coord_attacker[0])
@@ -23,11 +23,11 @@ def attack(game, player_color, orders):
             y_target = int(coord_target[0])
             x_range = abs(x_target - x_attacker)
             y_range = abs(y_target - y_attacker)
-            maximum = max(x_range, y_range)                 #Calcule la distance de Tchebychev
-            if maximum <= 3:                                #Vérifie si la portée est bonne (si la fourmi peut attaquer)
+            maximum = max(x_range, y_range)                 #Calculate Chebyshev distance
+            if maximum <= 3:                                #Check if the range is good (if the ant can attack)
                 for ant in game['ants'][player_color]:
-                    if x_attacker == ant[0] and y_attacker == ant[1]:       #Vérifie si le joueur a bien une fourmi sur la case
-                        for orange_ant in game['ants']['orange']:           #Vérifie si il y a bien une fourmi sur la case ciblée
+                    if x_attacker == ant[0] and y_attacker == ant[1]:       #Check if the player has an ant on the square
+                        for orange_ant in game['ants']['orange']:           #Check if there is an ant on the targeted square
                             if x_target == orange_ant[0] and y_target == orange_ant[1]:
                                 orange_ant[2] -= 1
                         for blue_ant in game['ants']['blue']:
