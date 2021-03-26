@@ -8,7 +8,7 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     Version
     --------------
     Specification : Alexis Van Wallendael (v.1 21/02/21)
-    Implementation : Alexandre Helman (v.4 20/03/21)
+    Implementation : Alexandre Helman (v.3 19/03/21)
     """
 
     orange_anthill_x = game["anthills"]["orange"]["x"]
@@ -58,8 +58,20 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     elif level == 3 :
         life = 7
 
-    is_lifting_clod = False
-    game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
+    for ant in game["ants"]["orange"] :
+        if ant[1] == orange_anthill_x :
+            if ant[0] == orange_anthill_y :
+                does_spawn = False
+            else :
+                does_spawn = True
+        else :
+            does_spawn = True
+
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["orange"].append([orange_anthill_y, orange_anthill_x, life, level, is_lifting_clod, orange_role])
+    elif does_spawn == False :
+        print("Une fourmi est deja positionnee sur la fourmiliere orange")
 
    ## Partie bleue
 
@@ -104,4 +116,17 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     elif level == 3 :
         life = 7
 
-    game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
+    for ant in game["ants"]["orange"] :
+        if ant[1] == orange_anthill_x :
+            if ant[0] == orange_anthill_y :
+                does_spawn = False
+            else :
+                does_spawn = True
+        else :
+            does_spawn = True
+
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["blue"].append([blue_anthill_y, blue_anthill_x, life, level, is_lifting_clod, blue_role])
+    elif does_spawn == False :
+        print("Une fourmi est deja positionnee sur la fourmiliere bleue")
