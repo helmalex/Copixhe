@@ -25,7 +25,7 @@ def order_treatment(orders):
     move_coordonates = []
     
     #Process movement orders 
-        for order in orders_list:
+            for order in orders_list:
         if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:5])
@@ -38,12 +38,7 @@ def order_treatment(orders):
             move_list.append(order)
             already_played.append(order[0:3])
             move_coordonates.append(order[5:])
-
-    
-    
-    #Process attack orders 
-    for order in orders_list:
-        if order[5:7] == ":∗" and order[0:5] not in already_played:
+        elif order[5:7] == ":∗" and order[0:5] not in already_played:               #Process attack orders
             attack_list.append(order)
             already_played.append(order[0:5])
         elif order[4:6] == ":∗" and order[0:4] not in already_played:
@@ -52,11 +47,7 @@ def order_treatment(orders):
         elif order[3:5] == ":∗" and order[0:3] not in already_played:
             attack_list.append(order)
             already_played.append(order[0:3])
-    
-    
-    #Process orders concerning clods of earth 
-    for order in orders_list:
-        if (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:
+        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           #Traite les ordres concernant les mottes de terre
             clods_list.append(order)
             already_played.append(order[0:5])
         elif (order[4:] == ":lift" or order[4:] == ":drop") and order[0:4] not in already_played:
@@ -66,4 +57,6 @@ def order_treatment(orders):
             clods_list.append(order)
             already_played.append(order[0:3])
 
+
     return attack_list,move_list,clods_list
+
