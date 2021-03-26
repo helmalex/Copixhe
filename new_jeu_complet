@@ -92,17 +92,17 @@ def load_board(path, game) :
     else :
         print("Votre fichier n'a pas le format requis.")
 
-def display(game_mode, game):
+def display(game, turn):
     """This function show the game board after each turns. If the game is played by 2 bots (0 players), there will be a 500ms break before each turn
 
     Parameters :
     ====================================================================
-    game_mode : how many users there will be (0,1,2) (int)
     game : data structure that contains game's informations (dict)
+    turn : actual turn (int)
 
     Version :
     ====================================================================
-    specification : Antoine Culot (v.1 21/02/21)
+    specification : Antoine Culot (v.2 26/03/21)
     implementation : Antoine Culot (v.4,1 24/03/21)
     """
 
@@ -112,8 +112,7 @@ def display(game_mode, game):
     #board parameters
     map_wight = game["board"]["length_x"]
     map_height = game["board"]["length_y"]
-    anthill_1 = [game["anthills"]["blue"]["x"], game["anthills"]["blue"]["y"]]
-    anthill_2 = [game["anthills"]["orange"]["x"], game["anthills"]["orange"]["y"]]
+
 
     #verify if the terminal is big enough to display the board 
     if term.height <= map_height and term.width < map_wight * 3 + 5:
@@ -151,28 +150,6 @@ def display(game_mode, game):
             print(term.move_yx(y_locate - (y-1), x_locate - 4) + term.white_on_orange + '|__'*3 + '|')
         print(term.move_yx(y_locate, x_locate) + '\u23CF')
 
-        #put the blue ants on the board
-        for ant in range(len(game['ants']['blue'])):
-            x_locate = int(game['ants']['blue'][ant][0]) * 3 + 2
-            y_locate = int(game['ants']['blue'][ant][1]) + 1
-            if game['ants']['blue'][ant][3] == 1:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_aqua + '\U0001f41c')
-            elif game['ants']['blue'][ant][3] == 2:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_blue + '\U0001f41c')
-            elif game['ants']['blue'][ant][3] == 3:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_cyan4 + '\U0001f41c')            
-
-        #put the orange ants on the board
-        for ant in range(len(game['ants']['orange'])):
-            x_locate = int(game['ants']['orange'][ant][0]) * 3 + 2
-            y_locate = int(game['ants']['orange'][ant][1]) + 1
-            if game['ants']['orange'][ant][3] == 1:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_yellow + '\U0001f41c')
-            elif game['ants']['orange'][ant][3] == 2:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f41c')
-            elif game['ants']['orange'][ant][3] == 3:
-                print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f41c')
-
         #put the clods on the board
         clod = -1
         for clods in game["clods"]:
@@ -186,18 +163,53 @@ def display(game_mode, game):
             if game["clods"][clod][2] == 3:
                 print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral4 + '\U0001f4a9') 
 
-        #put the legend
+        #put the blue ants on the board
+        for ant in range(len(game['ants']['blue'])):
+            x_locate = int(game['ants']['blue'][ant][0]) * 3 + 2
+            y_locate = int(game['ants']['blue'][ant][1]) + 1
+            if game['ants']['blue'][ant][3] == 1:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_aqua + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_aqua + '\U0001f4a9')
+            elif game['ants']['blue'][ant][3] == 2:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_blue + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_blue + '\U0001f4a9')
+            elif game['ants']['blue'][ant][3] == 3:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_cyan4 + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_cyan4 + '\U0001f4a9')          
 
+        #put the orange ants on the board
+        for ant in range(len(game['ants']['orange'])):
+            x_locate = int(game['ants']['orange'][ant][0]) * 3 + 2
+            y_locate = int(game['ants']['orange'][ant][1]) + 1
+            if game['ants']['orange'][ant][3] == 1:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_yellow + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_yellow + '\U0001f4a9')
+            elif game['ants']['orange'][ant][3] == 2:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f4a9')
+            elif game['ants']['orange'][ant][3] == 3:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_red + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_red + '\U0001f4a9')
+
+        #put the legend
         if term.height > map_height + 9:
             print(term.move_yx(map_height + 3, 0) + term.white_on_black + 'Summary :')
-            #clods
-            print(term.move_yx(map_height + 4, 0) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
-            print(term.move_yx(map_height + 5, 0) + term.white_on_orangered3  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
-            print(term.move_yx(map_height + 6, 0) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
             #anthills
             print(term.move_yx(map_height + 4, term.width//3) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
             print(term.move_yx(map_height + 5, term.width//3) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
-            #blue ants
+            #blue ants    
             print(term.move_yx(map_height + 7, 0) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
             print(term.move_yx(map_height + 8, 0) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
             print(term.move_yx(map_height + 9, 0) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
@@ -205,23 +217,30 @@ def display(game_mode, game):
             print(term.move_yx(map_height + 7, term.width//3) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
             print(term.move_yx(map_height + 8, term.width//3) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
             print(term.move_yx(map_height + 9, term.width//3) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
+            #clods
+            print(term.move_yx(map_height + 4, 0) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
+            print(term.move_yx(map_height + 5, 0) + term.white_on_orangered3  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
+            print(term.move_yx(map_height + 6, 0) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
             #note
             print(term.move_yx(map_height + 4, term.width//3*2) + 'Note : a clod carried by an ant')
             print(term.move_yx(map_height + 5, term.width//3*2) + 'takes on the color of the ant')
 
+        #display the actual turn
+        print(term.move_yx(map_height + 10, 0) + term.white_on_black + 'Turn : ' + str(turn) + ' / 200')
+        print(term.move_yx(map_height + 11, 0))
         print(term.move_yx(term.height, 0) + term.white_on_black)
 
 def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     """ Spawn a new ant beside the anthill
-
+    
     Parameters
     ------------------------
     game : data structure that contains game's informations (dict)
-
+    
     Version
     --------------
     Specification : Alexis Van Wallendael (v.1 21/02/21)
-    Implementation : Alexandre Helman (v.4 20/03/21)
+    Implementation : Alexandre Helman (v.3 19/03/21)
     """
 
     orange_anthill_x = game["anthills"]["orange"]["x"]
@@ -270,9 +289,15 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 5
     elif level == 3 :
         life = 7
+    does_spawn = True
+    for ant in game["ants"]["orange"] :
+        if ant[1] == orange_anthill_x and ant[0] == orange_anthill_y:
+            does_spawn = False
 
-    is_lifting_clod = False
-    game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["orange"].append([orange_anthill_y, orange_anthill_x, life, level, is_lifting_clod, orange_role])
+
 
    ## Partie bleue
 
@@ -316,8 +341,39 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 5
     elif level == 3 :
         life = 7
+    does_spawn = True
+    for ant in game["ants"]["blue"] :
+        if ant[1] == blue_anthill_x and ant[0] == blue_anthill_y:
+            does_spawn = False
 
-    game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
+
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["blue"].append([blue_anthill_y, blue_anthill_x, life, level, is_lifting_clod, blue_role])
+
+def user_play(player_color):
+    """This function show an example of all order that the user can give and ask to him to write his order
+    
+    Parameters :
+    ------------
+    player_color : color of the concerned player (str).
+    
+    Return :
+    ------------
+    final_order : string that contains all orders of the concerned player (str).
+    
+    Version :
+    ------------
+    specification : Alexandre Helman (v.2 26/03/21)
+    implementation : Alexandre Helman (v.1 26/03/2021)"""
+
+    print("C'est au joueur %s de donner ses ordres." %player_color)
+    print("Vos ordres doivent etre ecrits dans une seule entree unique et separes par des espaces.")    
+    print("Pour vos ordres, veuillez respecter le format suivant : \n'10−10:lift' : prendre une motte \n'10−10:lift' : deposer une motte \n'12−14:∗12−13' : attacker \n'10−10:@10−11' : se deplacer")
+    
+    final_order = input("Quels sont vos ordres ? ")
+
+    return final_order
 
 def IA_Play(game, player_color):
     """Read the board and play on its own
@@ -336,7 +392,7 @@ def IA_Play(game, player_color):
     Spécification : Bastien Marchal (v.2 22/03/2021)
     Implémentation: Bastien Marchal (v.1 22/03/2021)
 
-    """
+    """   
     ia_orders = ""
     ant_n = 0
     if player_color == "blue":
@@ -355,11 +411,12 @@ def IA_Play(game, player_color):
                     ia_orders += str(y_me) + "-" + str(x_me) + ":*" + str(y_enemy) + "-" + str(x_enemy) + " "
             enemy_n += 1
         clod_n = 0
-        for clod in game["clods"]:
-            if x_me == game["clods"][clod_n][0] :
-                if y_me == game["clods"][clod_n][1] :
-                    ia_orders += str(y_me) + "-" + str(x_me) + "lift" + " "
-            clod_n += 1
+        if not game["ants"][player_color][ant_n][4]:
+            for clod in game["clods"]:
+                if x_me == game["clods"][clod_n][0]:
+                    if y_me == game["clods"][clod_n][1] :
+                        ia_orders += str(y_me) + "-" + str(x_me) + ":lift" + " "
+                clod_n += 1
         change_x = random.randint(0, 2)
         change_y = random.randint(0, 2)
         if change_x == 0:
@@ -454,27 +511,59 @@ def order_treatment(orders):
     orders : string that contains the player's orders (str).
 
     Return
-    ------
-    all_orders : a list with all orders in 3 category (move_list, attack_list, lift_list) (list)
+    ----------
+    attack_list : list of attack orders
+    move_list : list of move orders
+    clods_list : list of lift and drop orders
 
     Version
     -------
     Spécification : Alexandre Helman (v.1 21/02/2021)
     Implémentaton : Alexis Van Wallendael (v.1 12/03/21)
+                    Alexis Van Wallendael (v.2 24/03/21)
     """
-    my_list = orders.split()
+    orders_list = orders.split()
+    already_played = []
     move_list = []
     attack_list = []
-    lift_list = []
+    clods_list = []
+    move_coordonates = []
+    
+    #Process movement orders 
+    for order in orders_list:
+        if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:5])
+            move_coordonates.append(order[7:])
+        elif order[4:6] == ":@" and order[0:4] not in already_played and order[6:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:4])
+            move_coordonates.append(order[6:])
+        elif order[3:5] == ":@" and order[0:3] not in already_played and order[5:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:3])
+            move_coordonates.append(order[5:])
+        elif order[5:7] == ":∗" and order[0:5] not in already_played:               #Process attack orders
+            attack_list.append(order)
+            already_played.append(order[0:5])
+        elif order[4:6] == ":∗" and order[0:4] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:4])
+        elif order[3:5] == ":∗" and order[0:3] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:3])
+        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           #Processes orders for clods
+            clods_list.append(order)
+            already_played.append(order[0:5])
+        elif (order[4:] == ":lift" or order[4:] == ":drop") and order[0:4] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:4])
+        elif (order[3:] == ":lift" or order[3:] == ":drop") and order[0:3] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:3])
 
-    for element in my_list:
-        if element[5:7] == ":@" or element[4:6] == ":@" or element[3:5] == ":@":
-            move_list.append(element)
-        elif element[5:7] == ":∗" or element[4:6] == ":∗" or element[3:5] == ":∗":
-            attack_list.append(element)
-        elif element[5] == ":" or element[4] == ":" or element[3] == ":":
-            lift_list.append(element)
-    return [move_list, attack_list, lift_list]
+
+    return attack_list,move_list,clods_list
 
 def gamemode():
     '''This function determinates how the game will be played (how many players, IA)
@@ -504,7 +593,7 @@ def gamemode():
 
     return mode
 
-def lift_drop(game, player_color, orders):
+def lift_drop(game, player_color, orders_verif):
     """Change the ant's state from False (empty) to True (full) if the ant lift a clod or from True(full) to False(empty)
     if the ant drop a clod
 
@@ -512,15 +601,15 @@ def lift_drop(game, player_color, orders):
     ----------
     game : data structure that contains game's informations (dict)
     player_color: player's color so orange or blue(str)
-    orders: player's order in lift_list(list)
+    orders_verif: player's order class in 3 category (attack, move, lift or drop) (list)
 
     Version
     -------
     Specification : Bastien Marchal (v.2 20/03/21)
     Implémentation : Bastien Marchal (v.1 20/03/21)
     """
-    if len(orders) == 2:
-        lift_list = orders[2]
+    if orders_verif[2] != []:
+        lift_list = orders_verif[2]
         for order in lift_list :
             info = order.split(":")
             coord_verif = info[0].split("-")
@@ -539,14 +628,14 @@ def lift_drop(game, player_color, orders):
                             if probably_x_verif == game["clods"][clod_n][0]:
                                 if probably_y_verif == game["clods"][clod_n][1]:
                                     if lift_drop == "lift":
-                                        if strength == game["clods"][clod_n][3]:
+                                        if strength >= game["clods"][clod_n][2]:
                                             game["ants"][player_color][ant_n][4] = True
                             clod_n += 1
                         if lift_drop == "drop":
                             game["ants"][player_color][ant_n][4] = False
                 ant_n += 1
 
-def move(game, player_color, orders):
+def move(game, player_color, orders_verif):
     """ Move the selected ant to the selected square
 
     Parameters
@@ -561,12 +650,12 @@ def move(game, player_color, orders):
     Specification : Bastien Marchal (v.2 21/02/21)
     Implémentation : Bastien Marchal (v.1 19/03/21)
     """
-    if player_color == "blue":
-        enemy_color = "orange"
-    else :
-        enemy_color = "blue"
-    move_list = orders[0]
-    if move_list != []:
+    if orders_verif[1] != []:
+        if player_color == "blue":
+            enemy_color = "orange"
+        else :
+            enemy_color = "blue"
+        move_list = orders_verif[1]
         for order in move_list :
             coordonates = order.split(":@")
             coord_verif = coordonates[0].split("-")
@@ -583,8 +672,8 @@ def move(game, player_color, orders):
                     if y == probably_y_verif:
                         if probably_x_new - probably_x_verif <= 1 and probably_x_new - probably_x_verif >= -1:
                             if probably_y_new - probably_y_verif <= 1 and probably_y_new - probably_y_verif >= -1:
-                                if probably_x_new <= game["board"]["length_x"] and probably_x_new >= 0:
-                                    if probably_y_new <= game["board"]["length_y"] and probably_y_new >= 0:
+                                if probably_x_new <= game["board"]["length_x"] and probably_x_new >= 1:
+                                    if probably_y_new <= game["board"]["length_y"] and probably_y_new >= 1:
                                         if probably_y_new != game["anthills"][enemy_color]["y"]:
                                             if probably_x_new != game["anthills"][enemy_color]["x"]:
                                                 for colors in game["ants"]:
@@ -602,71 +691,112 @@ def move(game, player_color, orders):
                                                                             game["ants"][player_color][ant_n][1] = probably_y_new
                                                                         else:
                                                                             clod_n = 0
+                                                                            no_move = False
                                                                             for clod in game["clods"]:
                                                                                 if probably_x_verif == game["clods"][clod_n][0]:
                                                                                     if probably_y_verif == game["clods"][clod_n][1]:
                                                                                         move_clod = clod_n
-                                                                                if probably_x_new == game["clods"][clod_n][0]:
-                                                                                    if probably_y_new == game["clods"][clod_n][1]:
-                                                                                        no_move = True
-                                                                                    else:
-                                                                                        no_move = False
-                                                                                else:
-                                                                                    no_move = False
+                                                                                        if probably_x_new == game["clods"][clod_n][0]:
+                                                                                            if probably_y_new == game["clods"][clod_n][1]:
+                                                                                                no_move = True
+                                                                                        if not no_move: 
+                                                                                            game["ants"][player_color][ant_n][0] = probably_x_new
+                                                                                            game["ants"][player_color][ant_n][1] = probably_y_new
+                                                                                            game["clods"][move_clod][0] = probably_x_new
+                                                                                            game["clods"][move_clod][1] = probably_y_new
                                                                                 clod_n += 1
-                                                                            if not no_move: 
-                                                                                game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                                game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                                game["clods"][move_clod][0] = probably_x_new
-                                                                                game["clods"][move_clod][1] = probably_y_new
                                                             else:
                                                                 if not game["ants"][player_color][ant_n][4]:
                                                                     game["ants"][player_color][ant_n][0] = probably_x_new
                                                                     game["ants"][player_color][ant_n][1] = probably_y_new
                                                                 else:
                                                                     clod_n = 0
+                                                                    no_move = False
                                                                     for clod in game["clods"]:
                                                                         if probably_x_verif == game["clods"][clod_n][0]:
                                                                             if probably_y_verif == game["clods"][clod_n][1]:
                                                                                 move_clod = clod_n
-                                                                        if probably_x_new == game["clods"][clod_n][0]:
-                                                                            if probably_y_new == game["clods"][clod_n][1]:
-                                                                                no_move = True
-                                                                            else:
-                                                                                no_move = False
-                                                                        else:
-                                                                            no_move = False
+                                                                                if probably_x_new == game["clods"][clod_n][0]:
+                                                                                    if probably_y_new == game["clods"][clod_n][1]:
+                                                                                        no_move = True
+                                                                                if not no_move: 
+                                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
+                                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
+                                                                                    game["clods"][move_clod][0] = probably_x_new
+                                                                                    game["clods"][move_clod][1] = probably_y_new
                                                                         clod_n += 1
-                                                                    if not no_move: 
-                                                                        game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                        game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                        game["clods"][move_clod][0] = probably_x_new
-                                                                        game["clods"][move_clod][1] = probably_y_new
+                                                                                
                                                         else:
                                                             if not game["ants"][player_color][ant_n][4]:
                                                                 game["ants"][player_color][ant_n][0] = probably_x_new
                                                                 game["ants"][player_color][ant_n][1] = probably_y_new
                                                             else:
                                                                 clod_n = 0
+                                                                no_move = False
                                                                 for clod in game["clods"]:
                                                                     if probably_x_verif == game["clods"][clod_n][0]:
                                                                         if probably_y_verif == game["clods"][clod_n][1]:
                                                                             move_clod = clod_n
-                                                                    if probably_x_new == game["clods"][clod_n][0]:
-                                                                        if probably_y_new == game["clods"][clod_n][1]:
-                                                                            no_move = True
-                                                                        else:
-                                                                            no_move = False
-                                                                    else:
-                                                                        no_move = False
+                                                                            if probably_x_new == game["clods"][clod_n][0]:
+                                                                                if probably_y_new == game["clods"][clod_n][1]:
+                                                                                    no_move = True
+                                                                            if not no_move: 
+                                                                                game["ants"][player_color][ant_n][0] = probably_x_new
+                                                                                game["ants"][player_color][ant_n][1] = probably_y_new
+                                                                                game["clods"][move_clod][0] = probably_x_new
+                                                                                game["clods"][move_clod][1] = probably_y_new
                                                                     clod_n += 1
-                                                                if not no_move: 
-                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                    game["clods"][move_clod][0] = probably_x_new
-                                                                    game["clods"][move_clod][1] = probably_y_new  
                                                         n_other_ant += 1
                 ant_n += 1
+
+def attack(game, player_color, orders):
+    """ Look in the game's info and remove one life's point at the ant hit
+
+    Parameters
+    -------------------
+    game : all the information on the game (dict)
+    player_color: player's color so orange or blue(str)
+    orders : player orders in attack_list (list)
+
+    Version
+    ------------
+    Specification : Bastien Marchal (v. 1 21/02/21)
+    Implémentation : Alexis Van Wallendael (v.1 20/03/21)"""
+    if orders[0] != []:
+        attack_list = orders[0]
+        if player_color == "blue" or player_color == "orange":
+            for order in attack_list:
+                coordonates = order.split(":∗")             #Extract the coordinates of the attacker and the coordinates of the target
+                coord_attacker = coordonates[0].split("-")
+                x_attacker = int(coord_attacker[1])
+                y_attacker = int(coord_attacker[0])
+                coord_target = coordonates[1].split("-")
+                x_target = int(coord_target[1])
+                y_target = int(coord_target[0])
+                x_range = abs(x_target - x_attacker)
+                y_range = abs(y_target - y_attacker)
+                maximum = max(x_range, y_range)                 #Calculate Chebyshev distance
+                if maximum <= 3:                                #Check if the range is good (if the ant can attack)
+                    for ant in game['ants'][player_color]:
+                        if x_attacker == ant[0] and y_attacker == ant[1]:       #Check if the player has an ant on the square
+                            for orange_ant in game['ants']['orange']:           #Check if there is an ant on the targeted square
+                                if x_target == orange_ant[0] and y_target == orange_ant[1]:
+                                    orange_ant[2] -= 1
+                            for blue_ant in game['ants']['blue']:
+                                if x_target == blue_ant[0] and y_target == blue_ant[1]:
+                                    blue_ant[2] -= 1
+
+
+    ant_n = 0                           #remove an ant from the dictionary if it has 0 HP 
+    for orant in game["ants"]["orange"]:
+        if game["ants"]["orange"][ant_n][2] == 0:
+            del game["ants"]["orange"][ant_n]
+        ant_n += 1
+    ant_n = 0
+    for blant in game["ants"]["blue"]:
+        if game["ants"]["blue"][ant_n][2] == 0:
+            del game["ants"]["blue"][ant_n]
+        ant_n +=1
 
 #=============================================================================================================================================================================================================#
 
@@ -696,23 +826,29 @@ game = {
 
     "clods" : []
 }
-path = "C:/Users/dmarc/Downloads/basic.cpx.txt"
+path = "C:/Users/dmarc/Downloads/small.cpx.txt"
 
 #=============================================================================================================================================================================================================#
 
 load_board(path, game)
 turn = 0
-for x in range(16):
-    display(0, game)
+for x in range(200):
+    display(game, turn)
+    time.sleep(0.5)
+
     over = is_game_over(game)
     if not over:
         orders = IA_Play(game, "orange")
         orders_verif = order_treatment(orders)
         lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
         move(game, "orange", orders_verif)
         orders = IA_Play(game, "blue")
         orders_verif = order_treatment(orders)
         lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
         move(game, "blue", orders_verif)
-        if turn % 5 == 0:
+
+        if turn % 5 == 0 :
             spawn(game)
+    turn += 1
