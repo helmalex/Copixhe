@@ -1,0 +1,48 @@
+def lift_drop(game, player_color, orders_verif):
+    """Change the ant's state from False (empty) to True (full) if the ant lift a clod or from True(full) to False(empty)
+    if the ant drop a clod
+
+    Parameters
+    ----------
+    game : data structure that contains game's informations (dict)
+    player_color: player's color so orange or blue(str)
+    orders_verif: player's order class in 3 category (attack, move, lift or drop) (list)
+
+    Version
+    -------
+    Specification : Bastien Marchal (v.2 20/03/21)
+    Implémentation : Bastien Marchal (v.1 20/03/21)
+    """
+    if orders_verif[2] != []:
+        lift_list = orders_verif[2]
+        for order in lift_list :
+            info = order.split(":")
+            coord_verif = info[0].split("-")
+            probably_y_verif = int(coord_verif[0])
+            probably_x_verif = int(coord_verif[1])
+            lift_drop = info[1]
+            ant_n = 0
+            for ant in game["ants"][player_color] :
+                x = game["ants"][player_color][ant_n][0]
+                y = game["ants"][player_color][ant_n][1]
+                strength = game["ants"][player_color][ant_n][3]
+                if x == probably_x_verif:
+                    if y == probably_y_verif:
+                        clod_n = 0
+                        for clod in game["clods"]:
+                            if probably_x_verif == game["clods"][clod_n][0]:
+                                if probably_y_verif == game["clods"][clod_n][1]:
+                                    if lift_drop == "lift":
+                                        if strength >= game["clods"][clod_n][2]:
+                                            game["ants"][player_color][ant_n][4] = True
+                                            game["ants"][player_color][ant_n].append(clod)
+                                            del game["clods"][clod_n]
+                            clod_n += 1
+
+                        if lift_drop == "drop":
+                            game["ants"][player_color][ant_n][4] = False
+                            clod_info = game["ants"][player_color][ant_n][6]
+                            del game["ants"][player_color][ant_n][6]
+                            game["clods"].append((x, y, clod_info[2]))
+
+                ant_n += 1
