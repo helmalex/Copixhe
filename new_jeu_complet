@@ -365,13 +365,13 @@ def user_play(player_color):
     Version :
     ------------
     specification : Alexandre Helman (v.2 26/03/21)
-    implementation : Alexandre Helman (v.1 26/03/2021)"""
+    implementation : Alexandre Helman (v.2 28/03/2021)"""
 
-    print("C'est au joueur %s de donner ses ordres." %player_color)
-    print("Vos ordres doivent etre ecrits dans une seule entree unique et separes par des espaces.")    
-    print("Pour vos ordres, veuillez respecter le format suivant : \n'10−10:lift' : prendre une motte \n'10−10:lift' : deposer une motte \n'12−14:∗12−13' : attacker \n'10−10:@10−11' : se deplacer")
+    print("The %s player can give his/her order(s)." %player_color)
+    print("Your orders must be written in a single string with a space between each of them.")    
+    print("Please write your orders like this : \n'10−10:lift' : to take a clod \n'10−10:drop' : to drop a clod \n'12−14:∗12−13' : to attack \n'10−10:@10−11' : to move")
     
-    final_order = input("Quels sont vos ordres ? ")
+    final_order = input("What are your orders ? ")
 
     return final_order
 
