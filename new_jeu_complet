@@ -291,12 +291,12 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 7
     does_spawn = True
     for ant in game["ants"]["orange"] :
-        if ant[1] == orange_anthill_x and ant[0] == orange_anthill_y:
+        if ant[0] == orange_anthill_x and ant[1] == orange_anthill_y:
             does_spawn = False
 
     if does_spawn == True :
         is_lifting_clod = False
-        game["ants"]["orange"].append([orange_anthill_y, orange_anthill_x, life, level, is_lifting_clod, orange_role])
+        game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
 
 
    ## Partie bleue
@@ -343,13 +343,13 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 7
     does_spawn = True
     for ant in game["ants"]["blue"] :
-        if ant[1] == blue_anthill_x and ant[0] == blue_anthill_y:
+        if ant[0] == blue_anthill_x and ant[1] == blue_anthill_y:
             does_spawn = False
 
 
     if does_spawn == True :
         is_lifting_clod = False
-        game["ants"]["blue"].append([blue_anthill_y, blue_anthill_x, life, level, is_lifting_clod, blue_role])
+        game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
 
 def user_play(player_color):
     """This function show an example of all order that the user can give and ask to him to write his order
@@ -665,7 +665,12 @@ def move(game, player_color, orders_verif):
             probably_y_new = int(coord_new[0])
             probably_x_new = int(coord_new[1])
             ant_n = 0
+            move_clod = []
             for ant in game["ants"][player_color] :
+                error_coord = True
+                error_other_ant = False
+                error_enemy_ant = False
+                error_clod = False
                 x = game["ants"][player_color][ant_n][0]
                 y = game["ants"][player_color][ant_n][1]
                 if x == probably_x_verif:
@@ -676,79 +681,46 @@ def move(game, player_color, orders_verif):
                                     if probably_y_new <= game["board"]["length_y"] and probably_y_new >= 1:
                                         if probably_y_new != game["anthills"][enemy_color]["y"]:
                                             if probably_x_new != game["anthills"][enemy_color]["x"]:
-                                                for colors in game["ants"]:
-                                                    color = colors
-                                                    n_other_ant = 0
-                                                    for other_ant in game["ants"][color]:
-                                                        x_other_ant = game["ants"][color][n_other_ant][0]
-                                                        y_other_ant = game["ants"][color][n_other_ant][1]
-                                                        if probably_x_new == x_other_ant:
-                                                            if probably_y_new == y_other_ant:
-                                                                if color == player_color:
-                                                                    if n_other_ant == ant_n:
-                                                                        if not game["ants"][player_color][ant_n][4]:
-                                                                            game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                            game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                        else:
-                                                                            clod_n = 0
-                                                                            no_move = False
-                                                                            for clod in game["clods"]:
-                                                                                if probably_x_verif == game["clods"][clod_n][0]:
-                                                                                    if probably_y_verif == game["clods"][clod_n][1]:
-                                                                                        move_clod = clod_n
-                                                                                        if probably_x_new == game["clods"][clod_n][0]:
-                                                                                            if probably_y_new == game["clods"][clod_n][1]:
-                                                                                                no_move = True
-                                                                                        if not no_move: 
-                                                                                            game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                                            game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                                            game["clods"][move_clod][0] = probably_x_new
-                                                                                            game["clods"][move_clod][1] = probably_y_new
-                                                                                clod_n += 1
-                                                            else:
-                                                                if not game["ants"][player_color][ant_n][4]:
-                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                else:
-                                                                    clod_n = 0
-                                                                    no_move = False
-                                                                    for clod in game["clods"]:
-                                                                        if probably_x_verif == game["clods"][clod_n][0]:
-                                                                            if probably_y_verif == game["clods"][clod_n][1]:
-                                                                                move_clod = clod_n
-                                                                                if probably_x_new == game["clods"][clod_n][0]:
-                                                                                    if probably_y_new == game["clods"][clod_n][1]:
-                                                                                        no_move = True
-                                                                                if not no_move: 
-                                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                                    game["clods"][move_clod][0] = probably_x_new
-                                                                                    game["clods"][move_clod][1] = probably_y_new
-                                                                        clod_n += 1
-                                                                                
-                                                        else:
-                                                            if not game["ants"][player_color][ant_n][4]:
-                                                                game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                game["ants"][player_color][ant_n][1] = probably_y_new
-                                                            else:
-                                                                clod_n = 0
-                                                                no_move = False
-                                                                for clod in game["clods"]:
-                                                                    if probably_x_verif == game["clods"][clod_n][0]:
-                                                                        if probably_y_verif == game["clods"][clod_n][1]:
-                                                                            move_clod = clod_n
-                                                                            if probably_x_new == game["clods"][clod_n][0]:
-                                                                                if probably_y_new == game["clods"][clod_n][1]:
-                                                                                    no_move = True
-                                                                            if not no_move: 
-                                                                                game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                                game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                                game["clods"][move_clod][0] = probably_x_new
-                                                                                game["clods"][move_clod][1] = probably_y_new
-                                                                    clod_n += 1
-                                                        n_other_ant += 1
+                                                error_coord = False
+                        n_other_ant = 0
+                        for other_ant in game["ants"][player_color]:
+                            x_other_ant = game["ants"][player_color][n_other_ant][0]
+                            y_other_ant = game["ants"][player_color][n_other_ant][1]
+                            if probably_x_new == x_other_ant:
+                                if probably_y_new == y_other_ant:
+                                    if n_other_ant != ant_n:
+                                        error_other_ant = True
+                            n_other_ant += 1
+                        n_enemy_ant = 0
+                        for enemy_ant in game["ants"][enemy_color]:
+                            x_enemy_ant = game["ants"][enemy_color][n_enemy_ant][0]
+                            y_enemy_ant = game["ants"][enemy_color][n_enemy_ant][1]
+                            if probably_x_new == x_enemy_ant:
+                                if probably_y_new == y_enemy_ant:
+                                    error_enemy_ant = True
+                            n_enemy_ant += 1
+                        if game["ants"][player_color][ant_n][4]:
+                            clod_n = 0
+                            for clod in game["clods"]:
+                                if probably_x_verif == game["clods"][clod_n][0]:
+                                    if probably_y_verif == game["clods"][clod_n][1]:
+                                        move_clod = clod_n
+                                if probably_x_new == game["clods"][clod_n][0]:
+                                    if probably_y_new == game["clods"][clod_n][1]:
+                                        error_clod = True
+                                clod_n += 1
+                
+                if not error_clod and not error_coord and not error_enemy_ant and not error_other_ant:
+                    if move_clod != []:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
+                        game["clods"][move_clod][0] = probably_x_new
+                        game["clods"][move_clod][1] = probably_y_new
+                    else:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
                 ant_n += 1
-
+                
 def attack(game, player_color, orders):
     """ Look in the game's info and remove one life's point at the ant hit
 
