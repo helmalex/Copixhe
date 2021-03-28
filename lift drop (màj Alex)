@@ -11,7 +11,7 @@ def lift_drop(game, player_color, orders_verif):
     Version
     -------
     Specification : Bastien Marchal (v.2 20/03/21)
-    Implémentation : Bastien Marchal (v.1 20/03/21)
+    Implementation : Bastien Marchal (v.1 20/03/21)
     """
     if orders_verif[2] != []:
         lift_list = orders_verif[2]
@@ -35,7 +35,7 @@ def lift_drop(game, player_color, orders_verif):
                                     if lift_drop == "lift":
                                         if strength >= game["clods"][clod_n][2]:
                                             game["ants"][player_color][ant_n][4] = True
-                                            game["ants"][player_color][ant_n].append(clod)
+                                            game["ants"][player_color][ant_n].append(clod[2])
                                             del game["clods"][clod_n]
                             clod_n += 1
 
@@ -43,6 +43,6 @@ def lift_drop(game, player_color, orders_verif):
                             game["ants"][player_color][ant_n][4] = False
                             clod_info = game["ants"][player_color][ant_n][6]
                             del game["ants"][player_color][ant_n][6]
-                            game["clods"].append((x, y, clod_info[2]))
+                            game["clods"].append((x, y, clod_info))
 
                 ant_n += 1
