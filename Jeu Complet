@@ -92,6 +92,8 @@ def load_board(path, game) :
     else :
         print("Votre fichier n'a pas le format requis.")
 
+    return y_board
+
 def display(game, turn):
     """This function show the game board after each turns. If the game is played by 2 bots (0 players), there will be a 500ms break before each turn
 
@@ -100,34 +102,38 @@ def display(game, turn):
     game : data structure that contains game's informations (dict)
     turn : actual turn (int)
 
+    Returns :
+    ====================================================================
+    y_board : the height of the board
+
     Version :
     ====================================================================
-    specification : Antoine Culot (v.2 26/03/21)
-    implementation : Antoine Culot (v.4,1 24/03/21)
+    specification : Antoine Culot (v.3 29/03/21)
+    implementation : Antoine Culot (v.5 29/03/21)
     """
 
     term = Terminal()
     print(term.home + term.white_on_black + term.clear)
 
     #board parameters
-    map_wight = game["board"]["length_x"]
+    map_width = game["board"]["length_x"]
     map_height = game["board"]["length_y"]
 
 
     #verify if the terminal is big enough to display the board 
-    if term.height <= map_height and term.width < map_wight * 3 + 5:
+    if term.height <= map_height + 5 and term.width < map_width * 3 + 5:
         print('FATAL ERROR : YOUR TERMINAL IS NOT BIG ENOUGH TO DISPLAY THE BOARD')
     else:
         #create the board
-        for x in range(map_wight):
+        for x in range(map_width):
             number = x+1
             print(term.move_xy(x*3+5, 0) + str(number))
-        print('    '+' __'*map_wight)
+        print('    '+' __'*map_width)
         for y in range(map_height):
             if y < 9:
-                print(' '+ str(y+1) + '  ' + '|__'*map_wight + '|')
+                print(' '+ str(y+1) + '  ' + '|__'*map_width + '|')
             else:
-                print(str(y+1) + '  ' + '|__'*map_wight + '|')
+                print(str(y+1) + '  ' + '|__'*map_width + '|')
 
         #put the blue anthills on the board
         x_blue_target = game["anthills"]["blue"]["x"]
@@ -158,10 +164,13 @@ def display(game, turn):
             y_locate = int(game["clods"][clod][1])
             if game["clods"][clod][2] == 1:
                 print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral1 + '\U0001f4a9')
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.coral1_on_black + '|')
             if game["clods"][clod][2] == 2:
                 print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_orangered3 + '\U0001f4a9') 
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.orangered3_on_black + '|')
             if game["clods"][clod][2] == 3:
-                print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral4 + '\U0001f4a9') 
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral4 + '\U0001f4a9')
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.coral4_on_black + '|') 
 
         #put the blue ants on the board
         for ant in range(len(game['ants']['blue'])):
@@ -203,32 +212,104 @@ def display(game, turn):
                 else :
                     print(term.move_yx(y_locate, x_locate) + term.white_on_red + '\U0001f4a9')
 
-        #put the legend
-        if term.height > map_height + 9:
-            print(term.move_yx(map_height + 3, 0) + term.white_on_black + 'Summary :')
+        #vérify if the terminal is big enough to display de legend
+        if term.width >= 143 and term.height >= map_height + 19:
+            #put the legend
+            print(term.move_yx(map_height + 4, 100) + term.white_on_black + 'Summary :')
             #anthills
-            print(term.move_yx(map_height + 4, term.width//3) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
-            print(term.move_yx(map_height + 5, term.width//3) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
+            print(term.move_yx(map_height + 6, 100) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
+            print(term.move_yx(map_height + 7, 100) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
             #blue ants    
-            print(term.move_yx(map_height + 7, 0) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
-            print(term.move_yx(map_height + 8, 0) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
-            print(term.move_yx(map_height + 9, 0) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
+            print(term.move_yx(map_height + 9, 100) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
+            print(term.move_yx(map_height + 10, 100) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
+            print(term.move_yx(map_height + 11, 100) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
             #orange ants
-            print(term.move_yx(map_height + 7, term.width//3) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
-            print(term.move_yx(map_height + 8, term.width//3) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
-            print(term.move_yx(map_height + 9, term.width//3) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
+            print(term.move_yx(map_height + 13, 100) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
+            print(term.move_yx(map_height + 14, 100) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
+            print(term.move_yx(map_height + 15, 100) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
             #clods
-            print(term.move_yx(map_height + 4, 0) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
-            print(term.move_yx(map_height + 5, 0) + term.white_on_orangered3  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
-            print(term.move_yx(map_height + 6, 0) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
+            print(term.move_yx(map_height + 6, 126) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
+            print(term.move_yx(map_height + 7, 126) + term.white_on_orangered3  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
+            print(term.move_yx(map_height + 8, 126) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
             #note
-            print(term.move_yx(map_height + 4, term.width//3*2) + 'Note : a clod carried by an ant')
-            print(term.move_yx(map_height + 5, term.width//3*2) + 'takes on the color of the ant')
+            print(term.move_yx(map_height + 6, 0) + 'Note : a clod carried by an ant')
+            print(term.move_yx(map_height + 7, 0) + 'takes on the color of the ant')
 
         #display the actual turn
-        print(term.move_yx(map_height + 10, 0) + term.white_on_black + 'Turn : ' + str(turn) + ' / 200')
-        print(term.move_yx(map_height + 11, 0) + str(game))
-        print(term.move_yx(term.height, 0) + term.white_on_black)
+        print(term.move_yx(map_height + 4, 0) + term.white_on_black + 'Turn : ' + str(turn) + ' / 200')
+
+def victory_screen(end_turns, team_color = ''):
+    '''This function will display a victory screen or a tie
+    
+    Parameters
+    ====================================================================================================
+    end_turns : did the game end after the 200 turns ? (bool)
+    team_color : the color of the victorious team (optional) (str)
+
+    Version
+    ====================================================================================================
+    Specification : Antoine Culot (v1 28/03/21)
+    Implementation : Antoine Culot (v1 28/03/21)
+    '''
+    
+    print(term.home + term.white_on_black + term.clear)
+
+    
+
+    #center coordonate
+    x = int(term.width/2)
+    y = int(term.height/2)
+
+    if team_color == 'blue':
+        victory_message = 'Blue Wins'
+        #check the end way
+        if end_turns == True:
+            explanation_message = 'Blue Team has the most clods'
+        else:
+            explanation_message = 'Blue Team has 8 clods around his anthill'
+        #display
+        print(term.move_yx(y, x - (int(len(victory_message)/2))) + term.white_on_black + victory_message)
+        print(term.move_yx(y + 1, x - (int(len(explanation_message)/2))) + term.white_on_black + explanation_message)
+        for a in range(12):
+            if a == 0 or a == 11:
+                print(term.move_yx(y - 5 + a, x - 25) + term.blue_on_blue + '.'*50)
+            else:
+                print(term.move_yx(y - 5 + a, x - 25) + term.blue_on_blue + '.'*2)
+                print(term.move_yx(y - 5 + a, x + 23) + term.blue_on_blue + '.'*2)
+
+        print(term.move_yx(0, term.height) + term.white_on_black)
+
+    elif team_color == 'orange':
+        victory_message = 'Orange Wins'
+        #check the end way
+        if end_turns == True:
+            explanation_message = 'Orange Team has the most clods'
+        else:
+            explanation_message = 'Orange Team has 8 clods around his anthill'
+        #display
+        print(term.move_yx(y, x - (int(len(victory_message)/2))) + term.white_on_black + victory_message)
+        print(term.move_yx(y + 1, x - (int(len(explanation_message)/2))) + term.white_on_black + explanation_message)
+        for a in range(12):
+            if a == 0 or a == 11:
+                print(term.move_yx(y - 5 + a, x - 25) + term.orange_on_orange + '.'*50)
+            else:
+                print(term.move_yx(y - 5 + a, x - 25) + term.orange_on_orange + '.'*2)
+                print(term.move_yx(y - 5 + a, x + 23) + term.orange_on_orange + '.'*2)
+
+    else:
+        victory_message = 'Tie'
+        explanation_message = 'Nobody Wins'
+        print(term.move_yx(y, x - (int(len(victory_message)/2))) + term.white_on_black + victory_message)
+        print(term.move_yx(y + 1, x - (int(len(explanation_message)/2))) + term.white_on_black + explanation_message)
+        for a in range(12):
+            if a == 0 or a == 11:
+                print(term.move_yx(y - 5 + a, x - 20) + term.blue_on_blue + '.'*20)
+                print(term.move_yx(y - 5 + a, x) + term.orange_on_orange + '.'*20)
+            else:
+                print(term.move_yx(y - 5 + a, x - 20) + term.blue_on_blue + '.'*2)
+                print(term.move_yx(y - 5 + a, x + 18) + term.orange_on_orange + '.'*2)   
+    
+    print(term.move_yx(0, term.height) + term.white_on_black)
 
 def spawn(game, blue_role = "Looter", orange_role = "Looter"):
     """ Spawn a new ant beside the anthill
@@ -291,12 +372,12 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 7
     does_spawn = True
     for ant in game["ants"]["orange"] :
-        if ant[1] == orange_anthill_x and ant[0] == orange_anthill_y:
+        if ant[0] == orange_anthill_x and ant[1] == orange_anthill_y:
             does_spawn = False
 
     if does_spawn == True :
         is_lifting_clod = False
-        game["ants"]["orange"].append([orange_anthill_y, orange_anthill_x, life, level, is_lifting_clod, orange_role])
+        game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
 
 
    ## Partie bleue
@@ -343,20 +424,21 @@ def spawn(game, blue_role = "Looter", orange_role = "Looter"):
         life = 7
     does_spawn = True
     for ant in game["ants"]["blue"] :
-        if ant[1] == blue_anthill_x and ant[0] == blue_anthill_y:
+        if ant[0] == blue_anthill_x and ant[1] == blue_anthill_y:
             does_spawn = False
 
 
     if does_spawn == True :
         is_lifting_clod = False
-        game["ants"]["blue"].append([blue_anthill_y, blue_anthill_x, life, level, is_lifting_clod, blue_role])
+        game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
 
-def user_play(player_color):
-    """This function show an example of all order that the user can give and ask to him to write his order
+def user_play(map_height, player_color):
+    """This function show an example of all order that the user can give and ask to him to write his order,  if the given order is illegal, it will be ask again to the user to enter a correct order
     
     Parameters :
     ------------
-    player_color : color of the concerned player (str).
+    player_color : color of the concerned player (str)
+    map_height : the height of the map (int)
     
     Return :
     ------------
@@ -364,16 +446,36 @@ def user_play(player_color):
     
     Version :
     ------------
-    specification : Alexandre Helman (v.2 26/03/21)
-    implementation : Alexandre Helman (v.1 26/03/2021)"""
+    specification : Alexandre Helman and Antoine Culot (v.3 29/03/21)
+    implementation : Alexandre Helman and Antoine Culot (v.2 29/03/2021)"""
 
-    print("C'est au joueur %s de donner ses ordres." %player_color)
-    print("Vos ordres doivent etre ecrits dans une seule entree unique et separes par des espaces.")    
-    print("Pour vos ordres, veuillez respecter le format suivant : \n'10−10:lift' : prendre une motte \n'10−10:lift' : deposer une motte \n'12−14:∗12−13' : attacker \n'10−10:@10−11' : se deplacer")
+    #the player enter his order(s)
+    print(term.move_yx(map_height + 11, 0) + term.white_on_black + "Your orders must be written in a single entry and separated by spaces.")    
+    print(term.move_yx(map_height + 12, 0) + "For your orders, please respect the following format : \n'10−10:lift' : take a clod \n'10−10:drop' : drop a clod \n'12−14:∗12−13' : attack \n'10−10:@10−11' : move")
+    print(term.move_yx(map_height + 9, 0) + "C'est au joueur %s de donner ses ordres." %player_color)
+    final_order = input("Quels sont vos ordres ? ")    
     
-    final_order = input("Quels sont vos ordres ? ")
+    #check if an order is illegal
+    check = 0
+    orders = final_order.split(' ')
+    for order in orders:
+        if final_order[5:7] == ':@' or final_order[5:7] == ':*' or final_order[5:10] == ':lift' or final_order[5:10] == 'drop':
+            check += 1
 
-    return final_order
+        elif final_order[4:6] == ':@' or final_order[4:6] == ':*' or final_order[4:9] == ':lift' or final_order[4:9] == 'drop':
+            check += 1
+
+        elif final_order[4:6] == ':@' or final_order[4:6] == ':*' or final_order[4:9] == ':lift' or final_order[4:9] == 'drop':
+            check += 1
+
+    if check == len(orders):
+        orders_OK = True
+    else:
+        orders_OK = False
+        display(game, turn)
+        print(term.move_yx(map_height + 8, 0) + term.red_on_black + 'ERROR : ILLEGAL ORDER GIVEN. PLEASE TRY AGAIN')
+
+    return final_order, orders_OK
 
 def IA_Play(game, player_color):
     """Read the board and play on its own
@@ -411,11 +513,12 @@ def IA_Play(game, player_color):
                     ia_orders += str(y_me) + "-" + str(x_me) + ":*" + str(y_enemy) + "-" + str(x_enemy) + " "
             enemy_n += 1
         clod_n = 0
-        for clod in game["clods"]:
-            if x_me == game["clods"][clod_n][0]:
-                if y_me == game["clods"][clod_n][1] :
-                    ia_orders += str(y_me) + "-" + str(x_me) + ":lift" + " "
-            clod_n += 1
+        if not game["ants"][player_color][ant_n][4]:
+            for clod in game["clods"]:
+                if x_me == game["clods"][clod_n][0]:
+                    if y_me == game["clods"][clod_n][1] :
+                        ia_orders += str(y_me) + "-" + str(x_me) + ":lift" + " "
+                clod_n += 1
         change_x = random.randint(0, 2)
         change_y = random.randint(0, 2)
         if change_x == 0:
@@ -446,21 +549,24 @@ def IA_Play(game, player_color):
         ant_n += 1
     return ia_orders
 
-def is_game_over(game):
+def is_game_over(game, turn):
     """ Check if the game is over or not
 
     Parameters
     ------------------------
     game : data structure that contains game's informations (dict)
+    turn : the actual turn (int)
 
     Return
     ------
     game_over : if game is over game_over = True and if game is not over game_over = False (bool)
+    victorious_team : return the color of the team that reached 8 anthills
+    end_turns : did the game finished after the 200th turn 
 
     Version
     ----------------
-    Specification : Alexis Van Wallendael (v.1 21/02/21)
-    Implémentaton : Alexis Van Wallendael (v.1 19/03/21)
+    Specification : Alexis Van Wallendael and Antoine Culot (v.2 28/03/21)
+    Implémentaton : Alexis Van Wallendael and Antoine Culot (v.2 28/03/21)
     """
     game_over = False
     blue_anthills = []
@@ -472,6 +578,9 @@ def is_game_over(game):
     orange_anthills.append(game['anthills']['orange']['y'])
 
     orange_victory = []
+
+    victorious_team = ''
+    end_turns = False
     for element in game['clods']:
         if (element[0] == orange_anthills[0] and element[1] == orange_anthills[1] + 1) or (
                 element[0] == orange_anthills[0] and element[1] == orange_anthills[1] - 1) or (
@@ -483,7 +592,7 @@ def is_game_over(game):
                 element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1] - 1):
             orange_victory.append(element)
     if len(orange_victory) == 8:
-        print("Orange has won !")
+        victorious_team += 'orange'
         game_over = True
 
     blue_victory = []
@@ -498,12 +607,17 @@ def is_game_over(game):
                 element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1] - 1):
             blue_victory.append(element)
     if len(blue_victory) == 8:
-        print("Blue has won !")
+        victorious_team += 'blue'
         game_over = True
-    return game_over
+
+    if turn > 200:
+        game_over = True
+        end_turns = True
+
+    return game_over, victorious_team, end_turns
 
 def order_treatment(orders):
-    """Analyse the string that contains the player's orders, if the given order is illegal, it will be ask again to the user to enter a correct order
+    """Analyse the string that contains the player's and IA orders to call the correct functions
 
     Parameters
     ----------
@@ -527,9 +641,9 @@ def order_treatment(orders):
     attack_list = []
     clods_list = []
     move_coordonates = []
-    
-    #Process movement orders 
+     
     for order in orders_list:
+        #Process movement orders
         if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
             move_list.append(order)
             already_played.append(order[0:5])
@@ -542,7 +656,8 @@ def order_treatment(orders):
             move_list.append(order)
             already_played.append(order[0:3])
             move_coordonates.append(order[5:])
-        elif order[5:7] == ":∗" and order[0:5] not in already_played:               #Process attack orders
+        #Process attack orders
+        elif order[5:7] == ":∗" and order[0:5] not in already_played:               
             attack_list.append(order)
             already_played.append(order[0:5])
         elif order[4:6] == ":∗" and order[0:4] not in already_played:
@@ -551,7 +666,8 @@ def order_treatment(orders):
         elif order[3:5] == ":∗" and order[0:3] not in already_played:
             attack_list.append(order)
             already_played.append(order[0:3])
-        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           #Processes orders for clods
+        #Processes orders for clods
+        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           
             clods_list.append(order)
             already_played.append(order[0:5])
         elif (order[4:] == ":lift" or order[4:] == ":drop") and order[0:4] not in already_played:
@@ -570,29 +686,37 @@ def gamemode():
     Return :
     =========================================================
     game_mode : how many users there will be (0,1,2) (int)
+    local_online : the game between two players or two IAs will be online or on the same PC (local/online) (str)
 
     Version :
     =========================================================
-    specification : Antoine Culot (v1 20/02/21)
-    implementation : Alexandre Helman (v2 20/03/2021)
+    specification : Antoine Culot (v2 29/03/21)
+    implementation : Alexandre Helman and Antoine Culot(v4 29/03/2021)
     '''
 
-    choix = input("Combien de joueurs ? (0 : IA v IA, 1 : joueur v IA, 2 : joueur vs. joueur)")
+    choice = int(input("How many players ? (0 : IA v IA, 1 : player v IA, 2 : player vs. player)"))
+
+    if choice == 0 or choice == 2: 
+        local_online = input("Do you want to play online or on the same computer ? (online/local)")
     mode = "unknown"
 
-    if choix == 0 :
-        mode = 'online'
-    elif choix == 1 :
+    if choice == 0 and local_online == 'local' :
+        mode = 'IA battle local'
+    elif choice == 0 and local_online == 'online':
+        mode = 'IA battle online'
+    elif choice == 1 :
         mode = 'solo'
-    elif choix == 2 :
+    elif choice == 2 and local_online == 'local':
         mode = 'local'
+    elif choice == 2 and local_online == 'online':
+        mode = 'online'
     else :
         print("Ce choix n'est pas valable.")
         gamemode()
 
     return mode
 
-def lift_drop(game, player_color, orders):
+def lift_drop(game, player_color, orders_verif):
     """Change the ant's state from False (empty) to True (full) if the ant lift a clod or from True(full) to False(empty)
     if the ant drop a clod
 
@@ -600,14 +724,14 @@ def lift_drop(game, player_color, orders):
     ----------
     game : data structure that contains game's informations (dict)
     player_color: player's color so orange or blue(str)
-    orders: player's order in lift_list(list)
+    orders_verif: player's order class in 3 category (attack, move, lift or drop) (list)
 
     Version
     -------
     Specification : Bastien Marchal (v.2 20/03/21)
-    Implémentation : Bastien Marchal (v.1 20/03/21)
+    Implementation : Bastien Marchal (v.1 20/03/21)
     """
-    if len(orders_verif) == 2:
+    if orders_verif[2] != []:
         lift_list = orders_verif[2]
         for order in lift_list :
             info = order.split(":")
@@ -627,14 +751,21 @@ def lift_drop(game, player_color, orders):
                             if probably_x_verif == game["clods"][clod_n][0]:
                                 if probably_y_verif == game["clods"][clod_n][1]:
                                     if lift_drop == "lift":
-                                        if strength >= game["clods"][clod_n][3]:
+                                        if strength >= game["clods"][clod_n][2]:
                                             game["ants"][player_color][ant_n][4] = True
+                                            game["ants"][player_color][ant_n].append(clod[2])
+                                            del game["clods"][clod_n]
                             clod_n += 1
+
                         if lift_drop == "drop":
                             game["ants"][player_color][ant_n][4] = False
+                            clod_info = game["ants"][player_color][ant_n][6]
+                            del game["ants"][player_color][ant_n][6]
+                            game["clods"].append((x, y, clod_info))
+
                 ant_n += 1
 
-def move(game, player_color, orders):
+def move(game, player_color, orders_verif):
     """ Move the selected ant to the selected square
 
     Parameters
@@ -649,12 +780,12 @@ def move(game, player_color, orders):
     Specification : Bastien Marchal (v.2 21/02/21)
     Implémentation : Bastien Marchal (v.1 19/03/21)
     """
-    if player_color == "blue":
-        enemy_color = "orange"
-    else :
-        enemy_color = "blue"
-    move_list = orders_verif[1]
-    if move_list != []:
+    if orders_verif[1] != []:
+        if player_color == "blue":
+            enemy_color = "orange"
+        else :
+            enemy_color = "blue"
+        move_list = orders_verif[1]
         for order in move_list :
             coordonates = order.split(":@")
             coord_verif = coordonates[0].split("-")
@@ -664,7 +795,12 @@ def move(game, player_color, orders):
             probably_y_new = int(coord_new[0])
             probably_x_new = int(coord_new[1])
             ant_n = 0
+            move_clod = []
             for ant in game["ants"][player_color] :
+                error_coord = True
+                error_other_ant = False
+                error_enemy_ant = False
+                error_clod = False
                 x = game["ants"][player_color][ant_n][0]
                 y = game["ants"][player_color][ant_n][1]
                 if x == probably_x_verif:
@@ -675,93 +811,442 @@ def move(game, player_color, orders):
                                     if probably_y_new <= game["board"]["length_y"] and probably_y_new >= 1:
                                         if probably_y_new != game["anthills"][enemy_color]["y"]:
                                             if probably_x_new != game["anthills"][enemy_color]["x"]:
-                                                for colors in game["ants"]:
-                                                    color = colors
-                                                    n_other_ant = 0
-                                                    for other_ant in game["ants"][color]:
-                                                        x_other_ant = game["ants"][color][n_other_ant][0]
-                                                        y_other_ant = game["ants"][color][n_other_ant][1]
-                                                        if probably_x_new == x_other_ant:
-                                                            if probably_y_new == y_other_ant:
-                                                                if color == player_color:
-                                                                    if n_other_ant == ant_n:
-                                                                        if not game["ants"][player_color][ant_n][4]:
-                                                                            game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                            game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                        else:
-                                                                            clod_n = 0
-                                                                            for clod in game["clods"]:
-                                                                                if probably_x_verif == game["clods"][clod_n][0]:
-                                                                                    if probably_y_verif == game["clods"][clod_n][1]:
-                                                                                        move_clod = clod_n
-                                                                                if probably_x_new == game["clods"][clod_n][0]:
-                                                                                    if probably_y_new == game["clods"][clod_n][1]:
-                                                                                        no_move = True
-                                                                                    else:
-                                                                                        no_move = False
-                                                                                else:
-                                                                                    no_move = False
-                                                                                clod_n += 1
-                                                                            if not no_move: 
-                                                                                game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                                game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                                game["clods"][move_clod][0] = probably_x_new
-                                                                                game["clods"][move_clod][1] = probably_y_new
-                                                            else:
-                                                                if not game["ants"][player_color][ant_n][4]:
-                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                else:
-                                                                    clod_n = 0
-                                                                    for clod in game["clods"]:
-                                                                        if probably_x_verif == game["clods"][clod_n][0]:
-                                                                            if probably_y_verif == game["clods"][clod_n][1]:
-                                                                                move_clod = clod_n
-                                                                        if probably_x_new == game["clods"][clod_n][0]:
-                                                                            if probably_y_new == game["clods"][clod_n][1]:
-                                                                                no_move = True
-                                                                            else:
-                                                                                no_move = False
-                                                                        else:
-                                                                            no_move = False
-                                                                        clod_n += 1
-                                                                    if not no_move: 
-                                                                        game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                        game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                        game["clods"][move_clod][0] = probably_x_new
-                                                                        game["clods"][move_clod][1] = probably_y_new
-                                                        else:
-                                                            if not game["ants"][player_color][ant_n][4]:
-                                                                game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                game["ants"][player_color][ant_n][1] = probably_y_new
-                                                            else:
-                                                                clod_n = 0
-                                                                for clod in game["clods"]:
-                                                                    if probably_x_verif == game["clods"][clod_n][0]:
-                                                                        if probably_y_verif == game["clods"][clod_n][1]:
-                                                                            move_clod = clod_n
-                                                                    if probably_x_new == game["clods"][clod_n][0]:
-                                                                        if probably_y_new == game["clods"][clod_n][1]:
-                                                                            no_move = True
-                                                                        else:
-                                                                            no_move = False
-                                                                    else:
-                                                                        no_move = False
-                                                                    clod_n += 1
-                                                                if not no_move: 
-                                                                    game["ants"][player_color][ant_n][0] = probably_x_new
-                                                                    game["ants"][player_color][ant_n][1] = probably_y_new
-                                                                    game["clods"][move_clod][0] = probably_x_new
-                                                                    game["clods"][move_clod][1] = probably_y_new  
-                                                        n_other_ant += 1
+                                                error_coord = False
+                        n_other_ant = 0
+                        for other_ant in game["ants"][player_color]:
+                            x_other_ant = game["ants"][player_color][n_other_ant][0]
+                            y_other_ant = game["ants"][player_color][n_other_ant][1]
+                            if probably_x_new == x_other_ant:
+                                if probably_y_new == y_other_ant:
+                                    if n_other_ant != ant_n:
+                                        error_other_ant = True
+                            n_other_ant += 1
+                        n_enemy_ant = 0
+                        for enemy_ant in game["ants"][enemy_color]:
+                            x_enemy_ant = game["ants"][enemy_color][n_enemy_ant][0]
+                            y_enemy_ant = game["ants"][enemy_color][n_enemy_ant][1]
+                            if probably_x_new == x_enemy_ant:
+                                if probably_y_new == y_enemy_ant:
+                                    error_enemy_ant = True
+                            n_enemy_ant += 1
+                        if game["ants"][player_color][ant_n][4]:
+                            clod_n = 0
+                            for clod in game["clods"]:
+                                if probably_x_verif == game["clods"][clod_n][0]:
+                                    if probably_y_verif == game["clods"][clod_n][1]:
+                                        move_clod = clod_n
+                                if probably_x_new == game["clods"][clod_n][0]:
+                                    if probably_y_new == game["clods"][clod_n][1]:
+                                        error_clod = True
+                                clod_n += 1
+                
+                if not error_clod and not error_coord and not error_enemy_ant and not error_other_ant:
+                    if move_clod != []:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
+                        game["clods"][move_clod][0] = probably_x_new
+                        game["clods"][move_clod][1] = probably_y_new
+                    else:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
                 ant_n += 1
+                
+def attack(game, player_color, orders):
+    """ Look in the game's info and remove one life's point at the ant hit
 
+    Parameters
+    -------------------
+    game : all the information on the game (dict)
+    player_color: player's color so orange or blue(str)
+    orders : player orders in attack_list (list)
+
+    Version
+    ------------
+    Specification : Bastien Marchal (v. 1 21/02/21)
+    Implémentation : Alexis Van Wallendael (v.1 20/03/21)"""
+    if orders[0] != []:
+        attack_list = orders[0]
+        if player_color == "blue" or player_color == "orange":
+            for order in attack_list:
+                coordonates = order.split(":∗")             #Extract the coordinates of the attacker and the coordinates of the target
+                coord_attacker = coordonates[0].split("-")
+                x_attacker = int(coord_attacker[1])
+                y_attacker = int(coord_attacker[0])
+                coord_target = coordonates[1].split("-")
+                x_target = int(coord_target[1])
+                y_target = int(coord_target[0])
+                x_range = abs(x_target - x_attacker)
+                y_range = abs(y_target - y_attacker)
+                maximum = max(x_range, y_range)                 #Calculate Chebyshev distance
+                if maximum <= 3:                                #Check if the range is good (if the ant can attack)
+                    for ant in game['ants'][player_color]:
+                        if x_attacker == ant[0] and y_attacker == ant[1]:       #Check if the player has an ant on the square
+                            for orange_ant in game['ants']['orange']:           #Check if there is an ant on the targeted square
+                                if x_target == orange_ant[0] and y_target == orange_ant[1]:
+                                    orange_ant[2] -= 1
+                            for blue_ant in game['ants']['blue']:
+                                if x_target == blue_ant[0] and y_target == blue_ant[1]:
+                                    blue_ant[2] -= 1
+
+
+    ant_n = 0                           #remove an ant from the dictionary if it has 0 HP 
+    for orant in game["ants"]["orange"]:
+        if game["ants"]["orange"][ant_n][2] == 0:
+            del game["ants"]["orange"][ant_n]
+        ant_n += 1
+    ant_n = 0
+    for blant in game["ants"]["blue"]:
+        if game["ants"]["blue"][ant_n][2] == 0:
+            del game["ants"]["blue"][ant_n]
+        ant_n +=1
+
+"""Module providing remote play features for UNamur programmation project (INFOB132).
+
+Sockets are used to transmit orders on local or remote machines.
+Firewalls or restrictive networks settings may block them.  
+
+More details on sockets: https://docs.python.org/2/library/socket.html.
+
+Author: Benoit Frenay (benoit.frenay@unamur.be).
+
+"""
+
+def create_server_socket(local_port, verbose):
+    """Creates a server socket.
+    
+    Parameters
+    ----------
+    local_port: port to listen to (int)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_in: server socket (socket.socket)
+    
+    """
+    
+    socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_in.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+
+    if verbose:
+        print(' binding on local port %d to accept a remote connection' % local_port)
+    
+    try:
+        socket_in.bind(('', local_port))
+    except:
+        raise IOError('local port %d already in use by your group or the referee' % local_port)
+    socket_in.listen(1)
+    
+    if verbose:
+        print('   done -> can now accept a remote connection on local port %d\n' % local_port)
+        
+    return socket_in
+
+def create_client_socket(remote_IP, remote_port, verbose):
+    """Creates a client socket.
+    
+    Parameters
+    ----------
+    remote_IP: IP address to send to (int)
+    remote_port: port to send to (int)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_out: client socket (socket.socket)
+    
+    """
+
+    socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_out.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+    
+    connected = False
+    msg_shown = False
+    
+    while not connected:
+        try:
+            if verbose and not msg_shown:
+                print(' connecting on %s:%d to send orders' % (remote_IP, remote_port))
+                
+            socket_out.connect((remote_IP, remote_port))
+            connected = True
+            
+            if verbose:
+                print('   done -> can now send orders to %s:%d\n' % (remote_IP, remote_port))
+        except:
+            if verbose and not msg_shown:
+                print('   connection failed -> will try again every 100 msec...')
+                
+            time.sleep(.1)
+            msg_shown = True
+            
+    return socket_out
+      
+def wait_for_connection(socket_in, verbose):
+    """Waits for a connection on a server socket.
+    
+    Parameters
+    ----------
+    socket_in: server socket (socket.socket)
+    verbose: True if verbose (bool)
+    
+    Returns
+    -------
+    socket_in: accepted connection (socket.socket)
+    
+    """
+    
+    if verbose:
+        print(' waiting for a remote connection to receive orders')
+        
+    socket_in, remote_address = socket_in.accept()
+    
+    if verbose:
+        print('   done -> can now receive remote orders from %s:%d\n' % remote_address)
+        
+    return socket_in            
+
+def create_connection(your_group, other_group=0, other_IP='127.0.0.1', verbose=False):
+    """Creates a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    your_group: id of your group (int)
+    other_group: id of the other group, if there is no referee (int, optional)
+    other_IP: IP address where the referee or the other group is (str, optional)
+    verbose: True only if connection progress must be displayed (bool, optional)
+    
+    Returns
+    -------
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    
+    Raises
+    ------
+    IOError: if your group fails to create a connection
+    
+    Notes
+    -----
+    Creating a connection can take a few seconds (it must be initialised on both sides).
+    
+    If there is a referee, leave other_group=0, otherwise other_IP is the id of the other group.
+    
+    If the referee or the other group is on the same computer than you, leave other_IP='127.0.0.1',
+    otherwise other_IP is the IP address of the computer where the referee or the other group is.
+    
+    The returned connection can be used directly with other functions in this module.
+            
+    """
+    
+    # init verbose display
+    if verbose:
+        print('\n[--- starts connection -----------------------------------------------------\n')
+        
+    # check whether there is a referee
+    if other_group == 0:
+        if verbose:
+            print('** group %d connecting to referee on %s **\n' % (your_group, other_IP))
+        
+        # create one socket (client only)
+        socket_out = create_client_socket(other_IP, 42000+your_group, verbose)
+        
+        connection = {'in':socket_out, 'out':socket_out}
+        
+        if verbose:
+            print('** group %d successfully connected to referee on %s **\n' % (your_group, other_IP))
+    else:
+        if verbose:
+            print('** group %d connecting to group %d on %s **\n' % (your_group, other_group, other_IP))
+
+        # create two sockets (server and client)
+        socket_in = create_server_socket(42000+your_group, verbose)
+        socket_out = create_client_socket(other_IP, 42000+other_group, verbose)
+        
+        socket_in = wait_for_connection(socket_in, verbose)
+        
+        connection = {'in':socket_in, 'out':socket_out}
+
+        if verbose:
+            print('** group %d successfully connected to group %d on %s **\n' % (your_group, other_group, other_IP))
+        
+    # end verbose display
+    if verbose:
+        print('----------------------------------------------------- connection started ---]\n')
+
+    return connection
+              
+def bind_referee(group_1, group_2, verbose=False):
+    """Put a referee between two groups.
+    
+    Parameters
+    ----------
+    group_1: id of the first group (int)
+    group_2: id of the second group (int)
+    verbose: True only if connection progress must be displayed (bool, optional)
+    
+    Returns
+    -------
+    connections: sockets to receive/send orders from both players (dict)
+    
+    Raises
+    ------
+    IOError: if the referee fails to create a connection
+    
+    Notes
+    -----
+    Putting the referee in place can take a few seconds (it must be connect to both groups).
+        
+    connections contains two connections (dict of socket.socket) which can be used directly
+    with other functions in this module.  connection of first (second) player has key 1 (2).
+            
+    """
+    
+    # init verbose display
+    if verbose:
+        print('\n[--- starts connection -----------------------------------------------------\n')
+
+    # create a server socket (first group)
+    if verbose:
+        print('** referee connecting to first group %d **\n' % group_1)        
+
+    socket_in_1 = create_server_socket(42000+group_1, verbose)
+    socket_in_1 = wait_for_connection(socket_in_1, verbose)
+
+    if verbose:
+        print('** referee succcessfully connected to first group %d **\n' % group_1)        
+        
+    # create a server socket (second group)
+    if verbose:
+        print('** referee connecting to second group %d **\n' % group_2)        
+
+    socket_in_2 = create_server_socket(42000+group_2, verbose)
+    socket_in_2 = wait_for_connection(socket_in_2, verbose)
+
+    if verbose:
+        print('** referee succcessfully connected to second group %d **\n' % group_2)        
+    
+    # end verbose display
+    if verbose:
+        print('----------------------------------------------------- connection started ---]\n')
+
+    return {1:{'in':socket_in_1, 'out':socket_in_1},
+            2:{'in':socket_in_2, 'out':socket_in_2}}
+
+def close_connection(connection):
+    """Closes a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    
+    """
+    
+    # get sockets
+    socket_in = connection['in']
+    socket_out = connection['out']
+    
+    # shutdown sockets
+    socket_in.shutdown(socket.SHUT_RDWR)    
+    socket_out.shutdown(socket.SHUT_RDWR)
+    
+    # close sockets
+    socket_in.close()
+    socket_out.close()
+       
+def notify_remote_orders(connection, orders):
+    """Notifies orders to a remote player.
+    
+    Parameters
+    ----------
+    connection: sockets to receive/send orders (dict of socket.socket)
+    orders: orders to notify (str)
+        
+    Raises
+    ------
+    IOError: if remote player cannot be reached
+    
+    """
+
+    # deal with null orders (empty string)
+    if orders == '':
+        orders = 'null'
+    
+    # send orders
+    try:
+        connection['out'].sendall(orders.encode())
+    except:
+        raise IOError('remote player cannot be reached')
+
+def get_remote_orders(connection):
+    """Returns orders from a remote player.
+
+    Parameters
+    ----------
+    connection: sockets to receive/send orders (dict of socket.socket)
+        
+    Returns
+    ----------
+    player_orders: orders given by remote player (str)
+
+    Raises
+    ------
+    IOError: if remote player cannot be reached
+            
+    """
+   
+    # receive orders    
+    try:
+        orders = connection['in'].recv(65536).decode()
+    except:
+        raise IOError('remote player cannot be reached')
+        
+    # deal with null orders
+    if orders == 'null':
+        orders = ''
+        
+    return orders
+
+def talk(group_1, type_1, group_2, type_2):
+    """Make two players talk (demo of remote_play).
+    
+    Parameters
+    ----------
+    group_1: group id of the first player (int)
+    type_1: type of the first player (str)
+    group_2: group id of the second player (int)
+    type_2: type of the second player (str)    
+    
+    
+    Notes
+    -----
+    A player is either 'AI' or 'remote', there can be at most one remote player.
+    
+    If there is a referee, set group id to 0 for remote player.
+    
+    Each player will run until one of the players says "Stop".
+    
+    """
+    
+    # create connection
+    if type_1 == 'remote':
+        connection = remote_play.create_connection(group_2, group_1, verbose=True)
+    if type_2 == 'remote':
+        connection = remote_play.create_connection(group_1, group_2, verbose=True)
+
+    # get player types
+    types = {1:type_1, 2:type_2}
+
+    # main loop
+
+    
+    # close connection
+    remote_play.close_connection(connection)
 #=============================================================================================================================================================================================================#
 
 from blessed import Terminal
 term = Terminal()
 import random
 import time
+import socket
 
 game = {
     "board" : {
@@ -784,28 +1269,190 @@ game = {
 
     "clods" : []
 }
-path = "C:/Users/antoi/OneDrive/Bureau/carte_test_small.cpx"
+path = "C:/Users/antoi/OneDrive/Bureau/carte_test_basic.cpx"
 
 #=============================================================================================================================================================================================================#
 
-load_board(path, game)
-turn = 0
-for x in range(200):
-    turn += 1
-    time.sleep(0.5)
+map_height = load_board(path, game)
+gamemode()
+turn = 1
 
-    over = is_game_over(game)
-    if not over:
+
+#game played by 2 IA on the same PC
+if gamemode() == 'IA battle local':
+    
+    game_is_over = False
+    while not game_is_over:
+        
+
+        #spawn all the five turn
+        if turn % 5 == 1 :
+            spawn(game)
+
+        #display the game
+        display(game, turn)
+
+        #orange play
         orders = IA_Play(game, "orange")
         orders_verif = order_treatment(orders)
         lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
         move(game, "orange", orders_verif)
+
+        #blue play
         orders = IA_Play(game, "blue")
         orders_verif = order_treatment(orders)
         lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
         move(game, "blue", orders_verif)
+        
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
 
-        if turn % 5 == 0 or turn == 1:
+    else:
+        victory_screen(end_turns, team_color)
+
+#game played by 2 IA online
+if gamemode() == 'IA battle online':
+    
+    talk(group_1, IA_play, group_xx, 'remote')
+    game_is_over = False
+    while not game_is_over:
+                
+        #spawn all the five turn
+        if turn % 5 == 1 :
             spawn(game)
 
-    display(game, turn)
+        #display the game
+        display(game, turn)
+
+        #orange play
+        orders = IA_Play(game, "orange")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
+        move(game, "orange", orders_verif)
+
+        #blue play
+        orders = talk(game, "blue")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
+        move(game, "blue", orders_verif)
+        
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
+
+    else:
+        victory_screen(end_turns, team_color)
+
+#game played by 1 player and 1 IA
+if gamemode() == 'solo':
+    
+    game_is_over = False
+    while not game_is_over:
+        
+
+        #spawn all the five turn
+        if turn % 5 == 1 :
+            spawn(game)
+
+        #display the game
+        display(game, turn)
+
+        #orange play
+        player_color = 'orange'
+        orders_OK = False
+        while not orders_OK:
+            orders, orders_OK = user_play(map_height, player_color)
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
+        move(game, "orange", orders_verif)
+
+        #blue play
+        orders = IA_Play(game, "blue")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
+        move(game, "blue", orders_verif)
+        
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
+
+    else:
+        victory_screen(end_turns, team_color)
+
+#game played by 2 users online
+if gamemode() == 'online':
+    talk(group_1, users_play, group_xx, 'remote')
+    
+    game_is_over = False
+    while not game_is_over:
+        
+
+        #spawn all the five turn
+        if turn % 5 == 1 :
+            spawn(game)
+
+        #display the game
+        display(game, turn)
+
+        #orange play
+        orders = user_play(game, "orange")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
+        move(game, "orange", orders_verif)
+
+        #blue play
+        orders = talk(game, "blue")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
+        move(game, "blue", orders_verif)
+        
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
+
+    else:
+        victory_screen(end_turns, team_color)
+
+#game played by 2 users on the same PC
+if gamemode() == 'local':
+    
+    game_is_over = False
+    while not game_is_over:
+        
+
+        #spawn all the five turn
+        if turn % 5 == 1 :
+            spawn(game)
+
+        #display the game
+        display(game, turn)
+
+        #orange play
+        orders = IA_Play(game, "orange")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
+        move(game, "orange", orders_verif)
+
+        #blue play
+        orders = IA_Play(game, "blue")
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
+        move(game, "blue", orders_verif)
+        
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
+
+    else:
+        victory_screen(end_turns, team_color)
