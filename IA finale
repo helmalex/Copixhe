@@ -1,0 +1,69 @@
+## ia final 
+
+game = {
+    "board" : {
+        "length_x" : 0, "length_y" : 0
+    },
+
+    "ants" : {
+        "orange" : [[2, 4, 1, 3, False, "Looter"]],
+        "blue" : [[3, 4, 2, 3, False, "Looter"]]
+    },
+
+    "anthills" : {
+        "orange" : {
+            "x" : 9, "y" : 3
+        },
+        "blue" : {
+            "x" : 22, "y" : 8
+        }
+    },
+
+    "clods" : [(8,3,3), (9,2,2), (10,3,1), (21, 8, 1), (22, 7, 2)]
+}
+
+def final_ai(game, color) :
+    """Clever version of the game AI.
+    
+    Parameter :
+    -----------
+    game : data structure that contains all game informations (dict).
+    
+    Version :
+    -----------
+    Specification : Alexandre Helman (v.1 28/03/2021)
+    Implementation : Alexandre Helman (v.1 28/03/2021)
+    """
+
+    ## identification of the enemy team
+
+    if color == 'orange' :
+        against = 'blue'
+    else :
+        against = 'orange'
+
+    ## how many ants do we have ?
+
+    nb_ant = 0
+    for ant in game["ants"][color] :
+        nb_ant += 1
+
+    ## if strictly less than 3 ants
+
+    if nb_ant < 3 :
+        if nb_ant == 1 :
+            if ((game["ants"][color][0][2] == 3) and (game["ants"][color][0][3] == 1)) or ((game["ants"][color][0][2] == 5) and (game["ants"][color][0][3] == 2)) or ((game["ants"][color][0][2] == 7) and (game["ants"][color][0][3] == 3)) :
+                game["ants"][color][0][5] == 'Looter'
+            elif ((game["ants"][color][0][2] != 3) and (game["ants"][color][0][3] == 1)) or ((game["ants"][color][0][2] != 5) and (game["ants"][color][0][3] == 2)) or ((game["ants"][color][0][2] != 7) and (game["ants"][color][0][3] == 3)) :
+                game["ants"][color][0][5] == 'Attacker'
+        if nb_ant == 2 :    
+            if ((game["ants"][color][0][2] == 3) and (game["ants"][color][0][3] == 1)) or ((game["ants"][color][0][2] == 5) and (game["ants"][color][0][3] == 2)) or ((game["ants"][color][0][2] == 7) and (game["ants"][color][0][3] == 3)) or ((game["ants"][color][1][2] == 3) and (game["ants"][color][1][3] == 1)) or ((game["ants"][color][1][2] == 5) and (game["ants"][color][1][3] == 2)) or ((game["ants"][color][1][2] == 7) and (game["ants"][color][1][3] == 3)):
+                game["ants"][color][0][5] == 'Looter'
+            elif ((game["ants"][color][0][2] != 3) and (game["ants"][color][0][3] == 1)) or ((game["ants"][color][0][2] != 5) and (game["ants"][color][0][3] == 2)) or ((game["ants"][color][0][2] != 7) and (game["ants"][color][0][3] == 3)) or ((game["ants"][color][1][2] != 3) and (game["ants"][color][1][3] == 1)) or ((game["ants"][color][1][2] != 5) and (game["ants"][color][1][3] == 2)) or ((game["ants"][color][1][2] != 7) and (game["ants"][color][1][3] == 3)):
+                game["ants"][color][0][5] == 'Attacker'
+
+    ## if 3 ants or more 
+
+    nb_looter = nb_ant/3
+    for ant in game["ants"][color] :
+        role = 'Attacker'
