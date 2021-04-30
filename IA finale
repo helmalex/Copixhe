@@ -67,3 +67,10 @@ def final_ai(game, color) :
     nb_looter = nb_ant/3
     for ant in game["ants"][color] :
         role = 'Attacker'
+        for clod in game["clods"] :
+            distx = 60
+            disty = 60
+            clodx = game["clods"][clod][0]
+            clody = game["clods"][clod][1]
+            if (clody - game["ants"][color][ant][0]) :
+                
