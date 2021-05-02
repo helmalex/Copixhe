@@ -1,0 +1,978 @@
+import remote_play
+from blessed import Terminal
+term = Terminal()
+import random
+import time
+
+game = {
+    "board" : {
+        "length_x" : 0, "length_y" : 0
+    },
+
+    "ants" : {
+        "orange" : [],
+        "blue" : []
+    },
+
+    "anthills" : {
+        "orange" : {
+            "x" : 0, "y" : 0
+        },
+        "blue" : {
+            "x" : 0, "y" : 0
+        }
+    },
+
+    "clods" : []
+}
+
+def create_connection(your_group, other_group=0, other_IP='127.0.0.1', verbose=False):
+    """Creates a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    your_group: id of your group (int)
+    other_group: id of the other group, if there is no referee (int, optional)
+    other_IP: IP address where the referee or the other group is (str, optional)
+    verbose: True only if connection progress must be displayed (bool, optional)
+    
+    Returns
+    -------
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    
+    Raises
+    ------
+    IOError: if your group fails to create a connection
+    
+    Notes
+    -----
+    Creating a connection can take a few seconds (it must be initialised on both sides).
+    
+    If there is a referee, leave other_group=0, otherwise other_IP is the id of the other group.
+    
+    If the referee or the other group is on the same computer than you, leave other_IP='127.0.0.1',
+    otherwise other_IP is the IP address of the computer where the referee or the other group is.
+    
+    The returned connection can be used directly with other functions in this module.
+            
+    """
+    
+    # init verbose display
+    if verbose:
+        print('\n[--- starts connection -----------------------------------------------------\n')
+        
+    # check whether there is a referee
+    if other_group == 0:
+        if verbose:
+            print('** group %d connecting to referee on %s **\n' % (your_group, other_IP))
+        
+        # create one socket (client only)
+        socket_out = create_client_socket(other_IP, 42000+your_group, verbose)
+        
+        connection = {'in':socket_out, 'out':socket_out}
+        
+        if verbose:
+            print('** group %d successfully connected to referee on %s **\n' % (your_group, other_IP))
+    else:
+        if verbose:
+            print('** group %d connecting to group %d on %s **\n' % (your_group, other_group, other_IP))
+
+        # create two sockets (server and client)
+        socket_in = create_server_socket(42000+your_group, verbose)
+        socket_out = create_client_socket(other_IP, 42000+other_group, verbose)
+        
+        socket_in = wait_for_connection(socket_in, verbose)
+        
+        connection = {'in':socket_in, 'out':socket_out}
+
+        if verbose:
+            print('** group %d successfully connected to group %d on %s **\n' % (your_group, other_group, other_IP))
+        
+    # end verbose display
+    if verbose:
+        print('----------------------------------------------------- connection started ---]\n')
+
+    return connection
+
+def get_remote_orders(connection):
+    """Returns orders from a remote player.
+
+    Parameters
+    ----------
+    connection: sockets to receive/send orders (dict of socket.socket)
+        
+    Returns
+    ----------
+    player_orders: orders given by remote player (str)
+
+    Raises
+    ------
+    IOError: if remote player cannot be reached
+            
+    """
+   
+    # receive orders    
+    try:
+        orders = connection['in'].recv(65536).decode()
+    except:
+        raise IOError('remote player cannot be reached')
+        
+    # deal with null orders
+    if orders == 'null':
+        orders = ''
+        
+    return orders
+
+def IA_Play(game, player_color):
+    """Read the board and play on its own
+
+    Parameters
+    ----------
+    game : data structure that contains game informations (dict).
+    player_color: player's color so orange or blue(str)
+
+    Return
+    ------
+    ia_orders : Orders from the IA for the actual game.
+
+    Version
+    -------
+    Spécification : Bastien Marchal (v.2 22/03/2021)
+    Implémentation: Bastien Marchal (v.1 22/03/2021)
+
+    """   
+    ia_orders = ""
+    ant_n = 0
+    if player_color == "blue":
+        enemy_color = "orange"
+    else :
+        enemy_color = "blue"
+    for ant in game["ants"][player_color]:
+        x_me = game["ants"][player_color][ant_n][0]
+        y_me = game["ants"][player_color][ant_n][1]
+        enemy_n = 0
+        for enemy in game["ants"][enemy_color]:
+            x_enemy = game["ants"][enemy_color][enemy_n][0]
+            y_enemy = game["ants"][enemy_color][enemy_n][1]
+            if x_me - x_enemy <= 1 and x_me - x_enemy >= -1 :
+                if y_me - y_enemy <= 1 and y_me - y_enemy >= -1 :
+                    ia_orders += str(y_me) + "-" + str(x_me) + ":*" + str(y_enemy) + "-" + str(x_enemy) + " "
+            enemy_n += 1
+        clod_n = 0
+        if not game["ants"][player_color][ant_n][4]:
+            for clod in game["clods"]:
+                if x_me == game["clods"][clod_n][0]:
+                    if y_me == game["clods"][clod_n][1] :
+                        ia_orders += str(y_me) + "-" + str(x_me) + ":lift" + " "
+                clod_n += 1
+        change_x = random.randint(0, 2)
+        change_y = random.randint(0, 2)
+        if change_x == 0:
+            new_x = x_me - 1
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        elif change_x == 1:
+            new_x = x_me
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        elif change_x == 2:
+            new_x = x_me + 1
+            if change_y == 0:
+                new_y = y_me - 1
+            if change_y == 1:
+                new_y = y_me
+            if change_y == 2:
+                new_y = y_me + 1
+        ia_orders += str(y_me) + "-" + str(x_me) + ":@" + str(new_y) + "-" + str(new_x) + " "
+        ant_n += 1
+    return ia_orders
+
+def notify_remote_orders(connection, orders):
+    """Notifies orders to a remote player.
+    
+    Parameters
+    ----------
+    connection: sockets to receive/send orders (dict of socket.socket)
+    orders: orders to notify (str)
+        
+    Raises
+    ------
+    IOError: if remote player cannot be reached
+    
+    """
+
+    # deal with null orders (empty string)
+    if orders == '':
+        orders = 'null'
+    
+    # send orders
+    try:
+        connection['out'].sendall(orders.encode())
+    except:
+        raise IOError('remote player cannot be reached')
+
+def is_game_over(game, turn):
+    """ Check if the game is over or not
+
+    Parameters
+    ------------------------
+    game : data structure that contains game's informations (dict)
+    turn : the actual turn (int)
+
+    Return
+    ------
+    game_over : if game is over game_over = True and if game is not over game_over = False (bool)
+    victorious_team : return the color of the team that reached 8 anthills
+    end_turns : did the game finished after the 200th turn 
+
+    Version
+    ----------------
+    Specification : Alexis Van Wallendael and Antoine Culot (v.2 28/03/21)
+    Implémentaton : Alexis Van Wallendael and Antoine Culot (v.2 28/03/21)
+    """
+    game_over = False
+    blue_anthills = []
+    blue_anthills.append(game['anthills']['blue']['x'])
+    blue_anthills.append(game['anthills']['blue']['y'])
+
+    orange_anthills = []
+    orange_anthills.append(game['anthills']['orange']['x'])
+    orange_anthills.append(game['anthills']['orange']['y'])
+
+    orange_victory = []
+
+    victorious_team = ''
+    end_turns = False
+    for element in game['clods']:
+        if (element[0] == orange_anthills[0] and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] and element[1] == orange_anthills[1] - 1) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1]) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1]) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1] + 1) or (
+                element[0] == orange_anthills[0] + 1 and element[1] == orange_anthills[1] - 1) or (
+                element[0] == orange_anthills[0] - 1 and element[1] == orange_anthills[1] - 1):
+            orange_victory.append(element)
+    if len(orange_victory) == 8:
+        victorious_team += 'orange'
+        game_over = True
+
+    blue_victory = []
+    for element in game['clods']:
+        if (element[0] == blue_anthills[0] and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] and element[1] == blue_anthills[1] - 1) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1]) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1]) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1] + 1) or (
+                element[0] == blue_anthills[0] + 1 and element[1] == blue_anthills[1] - 1) or (
+                element[0] == blue_anthills[0] - 1 and element[1] == blue_anthills[1] - 1):
+            blue_victory.append(element)
+    if len(blue_victory) == 8:
+        victorious_team += 'blue'
+        game_over = True
+
+    if turn > 200:
+        game_over = True
+        end_turns = True
+
+    return game_over, victorious_team, end_turns
+
+def load_board(path, game) :
+    """Read the board datas and organise them in a data structure
+
+    Parameters
+    -----------
+    path : string that contains the path towards the map file (str).
+    game : data structure that contains all the data of the game (dict).
+
+    Version
+    -----------
+    specification : Alexandre Helman (v.1 05/03/2021)
+    implementation : Alexandre Helman, Bastien Marchal (v.4 08/03/2021)
+    """
+
+    infos = open(path, 'r') 
+    load = infos.readlines()
+
+    ## chaque niveau d'imbrication verifie que les informations du plateau sont correctement disposees
+    if load[0] == 'map:\r\n' or 'map:\n' or 'map:\r' : 
+        y_board = int(load[1][0] + load[1][1])
+        x_board = int(load[1][3] + load[1][4])
+
+        if load[2] == 'anthills:\r\n' or 'anthills:\r' or 'anthills:\n' : 
+            ## extrait les coordonnees de la fourmiliere orange
+            if load[3][1] != ' ' :
+                anthills_orange_y = int(load[3][0] + load[3][1])
+                if load[3][4] !=  '\n' or '\r' or ' ' :
+                    anthills_orange_x = int(load[3][3] + load[3][4])
+                elif load[3][4] == '\n' or '\r' or ' ':
+                    anthills_orange_x = int(load[3][3])
+            elif load[3][1] == ' ' :
+                anthills_orange_y = int(load[3][0])
+                if load[3][3] != '\n' or '\r' or ' ' :
+                    anthills_orange_x = int(load[3][2] + load[3][3])
+                elif load[3][3] == '\n' or '\r' or ' ':
+                    anthills_orange_x = int(load[3][2])
+
+            ## extrait les coordonnees de la fourmiliere bleue
+            if load[4][1] != ' ' :
+                anthills_blue_y = int(load[4][0] + load[4][1])
+                if load[4][4] != '\n' or '\r' or ' ' :
+                    anthills_blue_x = int(load[4][3] + load[4][4])
+                elif load[4][4] == '\n' or '\r' or ' ':
+                    anthills_blue_x = int(load[4][3])
+            elif load[4][1] == ' ' :
+                anthills_blue_y = int(load[4][0])
+                if load[4][3] != '\n' or '\r' or ' ' :
+                    anthills_blue_x = int(load[4][2] + load[4][3])
+                elif load[4][3] == '\n' or '\r' or ' ':
+                    anthills_blue_x = int(load[4][2])
+
+            ## verifie que la partie clods commence correctement
+            if load[5] == 'clods:\r\n' or 'clods:\n' or 'clods:\r' :
+                n = 0
+                for lenght in load :
+                    n += 1
+
+                nb_clod = 0
+                for line in range(6, n) :
+
+                    if load[line][1] != " " :
+                        clody = int(load[line][0] + load[line][1])
+                        if load[line][4] != " " :
+                            clodx = int(load[line][3] + load[line][4])
+                            clod_weigth = int(load[line][6])
+                        elif load[line][4] == " " :
+                            clodx = int(load[line][3])
+                            clod_weigth = int(load[line][5])
+                    elif load[line][1] == " " :
+                        clody = int(load[line][0])
+                        if load[line][3] != " " :
+                            clodx = int(load[line][2] + load[line][3])
+                            clod_weigth = int(load[line][5])
+                        elif load[line][3] == " " :
+                            clodx = int(load[line][2])
+                            clod_weigth = int(load[line][4])
+
+                    ## range les informations sur les mottes dans la structure de donnees
+                    game["clods"].append([clodx, clody, clod_weigth])
+                    nb_clod += 1
+
+            ## range les informations sur les fourmilieres dans la structure de donnees
+            game["anthills"]["orange"]["x"] = anthills_orange_x
+            game["anthills"]["orange"]["y"] = anthills_orange_y
+            game["anthills"]["blue"]["x"] = anthills_blue_x
+            game["anthills"]["blue"]["y"] = anthills_blue_y
+
+        ## range les informations sur la taille du plateau dans la structure de donnees
+        game["board"]["length_x"] = x_board
+        game["board"]["length_y"] = y_board
+
+    else :
+        print("Votre fichier n'a pas le format requis.")
+
+    return y_board
+
+def display(game, turn):
+    """This function show the game board after each turns. If the game is played by 2 bots (0 players), there will be a 500ms break before each turn
+
+    Parameters :
+    ====================================================================
+    game : data structure that contains game's informations (dict)
+    turn : actual turn (int)
+
+    Returns :
+    ====================================================================
+    y_board : the height of the board
+
+    Version :
+    ====================================================================
+    specification : Antoine Culot (v.3 29/03/21)
+    implementation : Antoine Culot (v.5 29/03/21)
+    """
+
+    term = Terminal()
+    print(term.home + term.white_on_black + term.clear)
+
+    #board parameters
+    map_width = game["board"]["length_x"]
+    map_height = game["board"]["length_y"]
+
+
+    #verify if the terminal is big enough to display the board 
+    if term.height <= map_height + 5 and term.width < map_width * 3 + 5:
+        print('FATAL ERROR : YOUR TERMINAL IS NOT BIG ENOUGH TO DISPLAY THE BOARD')
+    else:
+        #create the board
+        for x in range(map_width):
+            number = x+1
+            print(term.move_xy(x*3+5, 0) + str(number))
+        print('    '+' __'*map_width)
+        for y in range(map_height):
+            if y < 9:
+                print(' '+ str(y+1) + '  ' + '|__'*map_width + '|')
+            else:
+                print(str(y+1) + '  ' + '|__'*map_width + '|')
+
+        #put the blue anthills on the board
+        x_blue_target = game["anthills"]["blue"]["x"]
+        y_blue_target = game["anthills"]["blue"]["y"]
+        x_locate = x_blue_target * 3 + 2
+        y_locate = y_blue_target + 1
+
+
+        for y in range(3):
+            print(term.move_yx(y_locate - (y-1), x_locate - 4) + term.white_on_blue + '|__'*3 + '|')
+        print(term.move_yx(y_locate, x_locate) + '\u23CF')
+
+        #put the orange anthills on the board
+        x_orange_target = game["anthills"]["orange"]["x"]
+        y_orange_target = game["anthills"]["orange"]["y"]
+        x_locate = x_orange_target * 3 + 2
+        y_locate = y_orange_target + 1
+
+        for y in range(3):
+            print(term.move_yx(y_locate - (y-1), x_locate - 4) + term.white_on_orange + '|__'*3 + '|')
+        print(term.move_yx(y_locate, x_locate) + '\u23CF')
+
+        #put the clods on the board
+        clod = -1
+        for clods in game["clods"]:
+            clod += 1
+            x_locate = int(game["clods"][clod][0])
+            y_locate = int(game["clods"][clod][1])
+            if game["clods"][clod][2] == 1:
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral1 + '\U0001f4a9')
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.coral1_on_black + '|')
+            if game["clods"][clod][2] == 2:
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_orangered3 + '\U0001f4a9') 
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.orangered3_on_black + '|')
+            if game["clods"][clod][2] == 3:
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 2) + term.white_on_coral4 + '\U0001f4a9')
+                print(term.move_yx(y_locate + 1, x_locate * 3 + 1) + term.coral4_on_black + '|') 
+
+        #put the blue ants on the board
+        for ant in range(len(game['ants']['blue'])):
+            x_locate = int(game['ants']['blue'][ant][0]) * 3 + 2
+            y_locate = int(game['ants']['blue'][ant][1]) + 1
+            if game['ants']['blue'][ant][3] == 1:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_aqua + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_aqua + '\U0001f4a9')
+            elif game['ants']['blue'][ant][3] == 2:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_blue + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_blue + '\U0001f4a9')
+            elif game['ants']['blue'][ant][3] == 3:
+                if game['ants']['blue'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_cyan4 + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_cyan4 + '\U0001f4a9')          
+
+        #put the orange ants on the board
+        for ant in range(len(game['ants']['orange'])):
+            x_locate = int(game['ants']['orange'][ant][0]) * 3 + 2
+            y_locate = int(game['ants']['orange'][ant][1]) + 1
+            if game['ants']['orange'][ant][3] == 1:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_yellow + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_yellow + '\U0001f4a9')
+            elif game['ants']['orange'][ant][3] == 2:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_orange + '\U0001f4a9')
+            elif game['ants']['orange'][ant][3] == 3:
+                if game['ants']['orange'][ant][4] == False :    
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_red + '\U0001f41c')
+                else :
+                    print(term.move_yx(y_locate, x_locate) + term.white_on_red + '\U0001f4a9')
+
+        #vérify if the terminal is big enough to display de legend
+        if term.width >= 143 and term.height >= map_height + 19:
+            #put the legend
+            print(term.move_yx(map_height + 4, 100) + term.white_on_black + 'Summary :')
+            #anthills
+            print(term.move_yx(map_height + 6, 100) + term.white_on_blue + '\u23CF' + ' ' + term.white_on_black + ' : blue team anthill')
+            print(term.move_yx(map_height + 7, 100) + term.white_on_orange + '\u23CF' + ' ' + term.white_on_black + ' : orange team anthill')
+            #blue ants    
+            print(term.move_yx(map_height + 9, 100) + term.white_on_aqua + '\U0001f41c' + term.white_on_black + ' : blue ant level 1')
+            print(term.move_yx(map_height + 10, 100) + term.white_on_blue + '\U0001f41c' + term.white_on_black + ' : blue ant level 2')
+            print(term.move_yx(map_height + 11, 100) + term.white_on_cyan4 + '\U0001f41c' + term.white_on_black + ' : blue ant level 3')
+            #orange ants
+            print(term.move_yx(map_height + 13, 100) + term.white_on_yellow + '\U0001f41c' + term.white_on_black + ' : orange ant level 1')
+            print(term.move_yx(map_height + 14, 100) + term.white_on_orange + '\U0001f41c' + term.white_on_black + ' : orange ant level 2')
+            print(term.move_yx(map_height + 15, 100) + term.white_on_red + '\U0001f41c' + term.white_on_black + ' : orange ant level 3')
+            #clods
+            print(term.move_yx(map_height + 6, 126) + term.white_on_coral1 + '\U0001f4a9' + term.white_on_black + ' : clod level 1')
+            print(term.move_yx(map_height + 7, 126) + term.white_on_orangered3  + '\U0001f4a9' + term.white_on_black + ' : clod level 2')
+            print(term.move_yx(map_height + 8, 126) + term.white_on_coral4 + '\U0001f4a9' + term.white_on_black + ' : clod level 3')
+            #note
+            print(term.move_yx(map_height + 6, 0) + 'Note : a clod carried by an ant')
+            print(term.move_yx(map_height + 7, 0) + 'takes on the color of the ant')
+
+        #display the actual turn
+        print(term.move_yx(map_height + 4, 0) + term.white_on_black + 'Turn : ' + str(turn) + ' / 200')
+
+def spawn(game, blue_role = "Looter", orange_role = "Looter"):
+    """ Spawn a new ant beside the anthill
+    
+    Parameters
+    ------------------------
+    game : data structure that contains game's informations (dict)
+    
+    Version
+    --------------
+    Specification : Alexis Van Wallendael (v.1 21/02/21)
+    Implementation : Alexandre Helman (v.3 19/03/21)
+    """
+
+    orange_anthill_x = game["anthills"]["orange"]["x"]
+    orange_anthill_y = game["anthills"]["orange"]["y"]
+    blue_anthill_x = game["anthills"]["blue"]["x"]
+    blue_anthill_y = game["anthills"]["blue"]["y"]
+
+    ## Partie orange
+    nb_orants = 0
+    for or_ants in game["ants"]["orange"] :
+        nb_orants += 1
+
+    get_orclods = 0
+    nclod = 0
+    for clod in game["clods"] :
+        clodx = game["clods"][nclod][0]
+        clody = game["clods"][nclod][1]
+        nclod += 1
+        if (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x, orange_anthill_y - 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y - 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x - 1, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y + 1) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y) :
+            get_orclods += 1
+        elif (clodx, clody) == (orange_anthill_x + 1, orange_anthill_y - 1) :
+            get_orclods += 1
+
+    if get_orclods < 3 :
+        level = 1
+    elif get_orclods >= 3 and get_orclods < 6 :
+        level = 2
+    elif get_orclods >= 6 :
+        level = 3
+
+    if level == 1 :
+        life = 3
+    elif level == 2 :
+        life = 5
+    elif level == 3 :
+        life = 7
+    does_spawn = True
+    for ant in game["ants"]["orange"] :
+        if ant[0] == orange_anthill_x and ant[1] == orange_anthill_y:
+            does_spawn = False
+
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["orange"].append([orange_anthill_x, orange_anthill_y, life, level, is_lifting_clod, orange_role])
+
+
+   ## Partie bleue
+
+    nb_blants = 0
+    for bl_ants in game["ants"]["blue"] :
+        nb_blants += 1
+
+    get_blclods = 0
+    nclod = 0
+    for clod in game["clods"] :
+        clodx = game["clods"][nclod][0]
+        clody = game["clods"][nclod][1]
+        nclod += 1
+        if (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x, blue_anthill_y - 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y - 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x - 1, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y + 1) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y) :
+            get_blclods += 1
+        elif (clodx, clody) == (blue_anthill_x + 1, blue_anthill_y - 1) :
+            get_blclods += 1
+
+    if get_blclods < 3 :
+        level = 1
+    elif get_blclods >= 3 and get_blclods < 6 :
+        level = 2
+    elif get_blclods >= 6 :
+        level = 3
+
+    if level == 1 :
+        life = 3
+    elif level == 2 :
+        life = 5
+    elif level == 3 :
+        life = 7
+    does_spawn = True
+    for ant in game["ants"]["blue"] :
+        if ant[0] == blue_anthill_x and ant[1] == blue_anthill_y:
+            does_spawn = False
+
+
+    if does_spawn == True :
+        is_lifting_clod = False
+        game["ants"]["blue"].append([blue_anthill_x, blue_anthill_y, life, level, is_lifting_clod, blue_role])
+
+def order_treatment(orders):
+    """Analyse the string that contains the player's and IA orders to call the correct functions
+
+    Parameters
+    ----------
+    orders : string that contains the player's orders (str).
+
+    Return
+    ----------
+    attack_list : list of attack orders
+    move_list : list of move orders
+    clods_list : list of lift and drop orders
+
+    Version
+    -------
+    Spécification : Alexandre Helman (v.1 21/02/2021)
+    Implémentaton : Alexis Van Wallendael (v.1 12/03/21)
+                    Alexis Van Wallendael (v.2 24/03/21)
+    """
+    orders_list = orders.split()
+    already_played = []
+    move_list = []
+    attack_list = []
+    clods_list = []
+    move_coordonates = []
+     
+    for order in orders_list:
+        #Process movement orders
+        if order[5:7] == ":@" and order[0:5] not in already_played and order[7:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:5])
+            move_coordonates.append(order[7:])
+        elif order[4:6] == ":@" and order[0:4] not in already_played and order[6:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:4])
+            move_coordonates.append(order[6:])
+        elif order[3:5] == ":@" and order[0:3] not in already_played and order[5:] not in move_coordonates:
+            move_list.append(order)
+            already_played.append(order[0:3])
+            move_coordonates.append(order[5:])
+        #Process attack orders
+        elif order[5:7] == ":∗" and order[0:5] not in already_played:               
+            attack_list.append(order)
+            already_played.append(order[0:5])
+        elif order[4:6] == ":∗" and order[0:4] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:4])
+        elif order[3:5] == ":∗" and order[0:3] not in already_played:
+            attack_list.append(order)
+            already_played.append(order[0:3])
+        #Processes orders for clods
+        elif (order[5:] == ":lift" or order[5:] == ":drop") and order[0:5] not in already_played:           
+            clods_list.append(order)
+            already_played.append(order[0:5])
+        elif (order[4:] == ":lift" or order[4:] == ":drop") and order[0:4] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:4])
+        elif (order[3:] == ":lift" or order[3:] == ":drop") and order[0:3] not in already_played:
+            clods_list.append(order)
+            already_played.append(order[0:3])
+
+
+    return attack_list,move_list,clods_list
+
+def lift_drop(game, player_color, orders_verif):
+    """Change the ant's state from False (empty) to True (full) if the ant lift a clod or from True(full) to False(empty)
+    if the ant drop a clod
+
+    Parameters
+    ----------
+    game : data structure that contains game's informations (dict)
+    player_color: player's color so orange or blue(str)
+    orders_verif: player's order class in 3 category (attack, move, lift or drop) (list)
+
+    Version
+    -------
+    Specification : Bastien Marchal (v.2 20/03/21)
+    Implementation : Bastien Marchal (v.1 20/03/21)
+    """
+    if orders_verif[2] != []:
+        lift_list = orders_verif[2]
+        for order in lift_list :
+            info = order.split(":")
+            coord_verif = info[0].split("-")
+            probably_y_verif = int(coord_verif[0])
+            probably_x_verif = int(coord_verif[1])
+            lift_drop = info[1]
+            ant_n = 0
+            for ant in game["ants"][player_color] :
+                x = game["ants"][player_color][ant_n][0]
+                y = game["ants"][player_color][ant_n][1]
+                strength = game["ants"][player_color][ant_n][3]
+                if x == probably_x_verif:
+                    if y == probably_y_verif:
+                        clod_n = 0
+                        for clod in game["clods"]:
+                            if probably_x_verif == game["clods"][clod_n][0]:
+                                if probably_y_verif == game["clods"][clod_n][1]:
+                                    if lift_drop == "lift":
+                                        if strength >= game["clods"][clod_n][2]:
+                                            game["ants"][player_color][ant_n][4] = True
+                                            game["ants"][player_color][ant_n].append(clod[2])
+                                            del game["clods"][clod_n]
+                            clod_n += 1
+
+                        if lift_drop == "drop":
+                            game["ants"][player_color][ant_n][4] = False
+                            clod_info = game["ants"][player_color][ant_n][6]
+                            del game["ants"][player_color][ant_n][6]
+                            game["clods"].append((x, y, clod_info))
+
+                ant_n += 1
+
+def move(game, player_color, orders_verif):
+    """ Move the selected ant to the selected square
+
+    Parameters
+    ----------
+    game : data structure that contains game's informations (dict)
+    player_color: player's color so orange or blue(str)
+    orders: player's order in move_list(lift)
+
+
+    Version
+    -------
+    Specification : Bastien Marchal (v.2 21/02/21)
+    Implémentation : Bastien Marchal (v.1 19/03/21)
+    """
+    if orders_verif[1] != []:
+        if player_color == "blue":
+            enemy_color = "orange"
+        else :
+            enemy_color = "blue"
+        move_list = orders_verif[1]
+        for order in move_list :
+            coordonates = order.split(":@")
+            coord_verif = coordonates[0].split("-")
+            probably_y_verif = int(coord_verif[0])
+            probably_x_verif = int(coord_verif[1])
+            coord_new = coordonates[1].split("-")
+            probably_y_new = int(coord_new[0])
+            probably_x_new = int(coord_new[1])
+            ant_n = 0
+            move_clod = []
+            for ant in game["ants"][player_color] :
+                error_coord = True
+                error_other_ant = False
+                error_enemy_ant = False
+                error_clod = False
+                x = game["ants"][player_color][ant_n][0]
+                y = game["ants"][player_color][ant_n][1]
+                if x == probably_x_verif:
+                    if y == probably_y_verif:
+                        if probably_x_new - probably_x_verif <= 1 and probably_x_new - probably_x_verif >= -1:
+                            if probably_y_new - probably_y_verif <= 1 and probably_y_new - probably_y_verif >= -1:
+                                if probably_x_new <= game["board"]["length_x"] and probably_x_new >= 1:
+                                    if probably_y_new <= game["board"]["length_y"] and probably_y_new >= 1:
+                                        if probably_y_new != game["anthills"][enemy_color]["y"]:
+                                            if probably_x_new != game["anthills"][enemy_color]["x"]:
+                                                error_coord = False
+                        n_other_ant = 0
+                        for other_ant in game["ants"][player_color]:
+                            x_other_ant = game["ants"][player_color][n_other_ant][0]
+                            y_other_ant = game["ants"][player_color][n_other_ant][1]
+                            if probably_x_new == x_other_ant:
+                                if probably_y_new == y_other_ant:
+                                    if n_other_ant != ant_n:
+                                        error_other_ant = True
+                            n_other_ant += 1
+                        n_enemy_ant = 0
+                        for enemy_ant in game["ants"][enemy_color]:
+                            x_enemy_ant = game["ants"][enemy_color][n_enemy_ant][0]
+                            y_enemy_ant = game["ants"][enemy_color][n_enemy_ant][1]
+                            if probably_x_new == x_enemy_ant:
+                                if probably_y_new == y_enemy_ant:
+                                    error_enemy_ant = True
+                            n_enemy_ant += 1
+                        if game["ants"][player_color][ant_n][4]:
+                            clod_n = 0
+                            for clod in game["clods"]:
+                                if probably_x_verif == game["clods"][clod_n][0]:
+                                    if probably_y_verif == game["clods"][clod_n][1]:
+                                        move_clod = clod_n
+                                if probably_x_new == game["clods"][clod_n][0]:
+                                    if probably_y_new == game["clods"][clod_n][1]:
+                                        error_clod = True
+                                clod_n += 1
+                
+                if not error_clod and not error_coord and not error_enemy_ant and not error_other_ant:
+                    if move_clod != []:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
+                        game["clods"][move_clod][0] = probably_x_new
+                        game["clods"][move_clod][1] = probably_y_new
+                    else:
+                        game["ants"][player_color][ant_n][0] = probably_x_new
+                        game["ants"][player_color][ant_n][1] = probably_y_new
+                ant_n += 1
+
+def attack(game, player_color, orders):
+    """ Look in the game's info and remove one life's point at the ant hit
+
+    Parameters
+    -------------------
+    game : all the information on the game (dict)
+    player_color: player's color so orange or blue(str)
+    orders : player orders in attack_list (list)
+
+    Version
+    ------------
+    Specification : Bastien Marchal (v. 1 21/02/21)
+    Implémentation : Alexis Van Wallendael (v.1 20/03/21)"""
+    if orders[0] != []:
+        attack_list = orders[0]
+        if player_color == "blue" or player_color == "orange":
+            for order in attack_list:
+                coordonates = order.split(":∗")             #Extract the coordinates of the attacker and the coordinates of the target
+                coord_attacker = coordonates[0].split("-")
+                x_attacker = int(coord_attacker[1])
+                y_attacker = int(coord_attacker[0])
+                coord_target = coordonates[1].split("-")
+                x_target = int(coord_target[1])
+                y_target = int(coord_target[0])
+                x_range = abs(x_target - x_attacker)
+                y_range = abs(y_target - y_attacker)
+                maximum = max(x_range, y_range)                 #Calculate Chebyshev distance
+                if maximum <= 3:                                #Check if the range is good (if the ant can attack)
+                    for ant in game['ants'][player_color]:
+                        if x_attacker == ant[0] and y_attacker == ant[1]:       #Check if the player has an ant on the square
+                            for orange_ant in game['ants']['orange']:           #Check if there is an ant on the targeted square
+                                if x_target == orange_ant[0] and y_target == orange_ant[1]:
+                                    orange_ant[2] -= 1
+                            for blue_ant in game['ants']['blue']:
+                                if x_target == blue_ant[0] and y_target == blue_ant[1]:
+                                    blue_ant[2] -= 1
+
+
+    ant_n = 0                           #remove an ant from the dictionary if it has 0 HP 
+    for orant in game["ants"]["orange"]:
+        if game["ants"]["orange"][ant_n][2] == 0:
+            del game["ants"]["orange"][ant_n]
+        ant_n += 1
+    ant_n = 0
+    for blant in game["ants"]["blue"]:
+        if game["ants"]["blue"][ant_n][2] == 0:
+            del game["ants"]["blue"][ant_n]
+        ant_n +=1
+
+def close_connection(connection):
+    """Closes a connection with a referee or another group.
+    
+    Parameters
+    ----------
+    connection: socket(s) to receive/send orders (dict of socket.socket)
+    
+    """
+    
+    # get sockets
+    socket_in = connection['in']
+    socket_out = connection['out']
+    
+    # shutdown sockets
+    socket_in.shutdown(socket.SHUT_RDWR)    
+    socket_out.shutdown(socket.SHUT_RDWR)
+    
+    # close sockets
+    socket_in.close()
+    socket_out.close()
+
+def play_game(path, group_1, type_1, group_2, type_2)
+    """launch the game
+
+    Parameters
+    ----------
+    CPX_file : string that contains the path towards the map file (str)
+    group_1: group id of the first player (int)
+    type_1: type of the first player (str)
+    group_2: group id of the second player (int)
+    type_2: type of the second player (str)  
+
+    Version
+    -------
+    Specification : Bastien Marchal (v.1 02/05/21)
+    Implémentation : Bastien Marchal (v.1 02/05/21)
+    """
+
+    if type_1 == "remote":
+        connection = create_connection(group_2, group_1)
+    elif type_2 == "remote":
+        connection = create_connection(group_1, group_2)
+
+    load_board(path, game)
+    turn = 0
+    game_is_over = False
+    while not game_is_over:
+        if turn % 5 == 0 :
+            spawn(game)
+
+        display(game, turn)
+        if type_1 == "remote":
+            orders = get_remote_orders(connection)
+        else:
+            orders = IA_Play(game, "orange")
+            if type_2 == "remote":
+                notify_remote_orders(connection, orders)
+
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "orange", orders_verif)
+        attack(game, "orange", orders_verif)
+        move(game, "orange", orders_verif)
+
+        if type_2 == "remote":
+            orders = get_remote_orders(connection)
+        else:
+            orders = IA_Play(game, "blue")
+            if type_1 == "remote":
+                notify_remote_orders(connection, orders)
+
+        orders_verif = order_treatment(orders)
+        lift_drop(game, "blue", orders_verif)
+        attack(game, "blue", orders_verif)
+        move(game, "blue", orders_verif)
+
+        turn += 1
+        time.sleep(0.5)
+        game_is_over, team_color, end_turns = is_game_over(game, turn)
+    if type_1 == "remote" or type_2 == "remote":
+        close_connection(connection)
+    victory_screen(end_turns, team_color)
